@@ -3,5 +3,7 @@ import javax.mail.MessagingException;
 
 
 public interface MailSendingService {
-    void demoSendMail() throws MessagingException;
+    void mailConfirmRegister(String email, String fullName, int userId) throws MessagingException;
+
+    void mailResetPassword(String email, String display_name, String newPassword) throws MessagingException;
 }

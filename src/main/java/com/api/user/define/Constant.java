@@ -9,7 +9,8 @@ public class Constant {
     public static final int SUCCESS_CODE = 0;
     public static final String SUCCESSFUL_MESSAGE = "Success";
     public static final String OBJECT_EMPTY_FIELD = "Object empty";
-    public static final String USER_CREATE_EXISTING = "User created";
+    public static final String USER_CREATE_EXISTING = "User name created";
+    public static final String USER_NOT_EXITED = "User not exited";
     public static String FAIL_MESSAGE = "Fail";
 
     public static final class MailConfiguration {

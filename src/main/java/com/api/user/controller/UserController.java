@@ -8,6 +8,7 @@ import com.api.user.exception.ApiServiceException;
 import com.api.user.security.TokenProvider;
 import com.api.user.service.MailSendingService;
 import com.api.user.service.UserService;
+import com.api.user.uitls.AESUtil;
 import com.api.user.uitls.ServiceUtils;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
@@ -46,19 +47,6 @@ public class UserController {
         this.userService = userService;
     }
 
-    @RequestMapping(value = {"/mail"}, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public ResponseEntity<?> sendMail() throws MessagingException {
-
-        mailSendingService.demoSendMail();
-        Response responseObject = Response.builder()
-                .code(0)
-                .message("success")
-                .build();
-        return new ResponseEntity<>(responseObject, HttpStatus.OK);
-
-    }
-
     @RequestMapping(value = {"/get-all"}, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<?> getAllUser() {
@@ -95,24 +83,64 @@ public class UserController {
 
     }
 
+    @RequestMapping(value = {"/confirm-register"}, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> confirmRegister(@RequestParam String id) throws ApiServiceException {
+        String userId = AESUtil.decrypt(id);
+        User user = userService.findByUserId(Integer.parseInt(userId));
+        if (ServiceUtils.isEmpty(user)) {
+            throw new ApiServiceException(Constant.USER_NOT_EXITED);
+        }
+        user.setStatus(1);
+        userService.update(user);
+        Response response = Response.builder()
+                .code(Constant.SUCCESS_CODE)
+                .message(Constant.SUCCESSFUL_MESSAGE)
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = {"/reset-password"}, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> resetPassword(@RequestParam String email) throws ApiServiceException, MessagingException {
+        User user = userService.findByEmail(email);
+        if (ServiceUtils.isEmpty(user)) {
+            throw new ApiServiceException(Constant.USER_NOT_EXITED);
+        }
+        String newPassword = ServiceUtils.generateRandomString();
+        log.info("New password: {}", newPassword);
+        user.setPassword(ServiceUtils.encodePassword(newPassword));
+        userService.update(user);
+        mailSendingService.mailResetPassword(user.getEmail(), user.getDisplay_name(), newPassword);
+        Response response = Response.builder()
+                .code(Constant.SUCCESS_CODE)
+                .message(Constant.SUCCESSFUL_MESSAGE)
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @RequestMapping(value = {"/register"}, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> registerUser(@RequestBody User user) throws ApiServiceException {
-        Response response;
-        if (user.getUsername().isEmpty() || user.getPassword().isEmpty() || user.getRole_id() == 0) {
+    public ResponseEntity<?> registerUser(@RequestBody User user) throws ApiServiceException, MessagingException {
+        if (user.getUsername().isEmpty() || user.getPassword().isEmpty() || user.getRole_id() == 0 || ServiceUtils.isEmpty(user.getEmail())
+                || ServiceUtils.isEmpty(user.getEmail())
+                || ServiceUtils.isEmpty(user.getDisplay_name())) {
             throw new ApiServiceException(Constant.OBJECT_EMPTY_FIELD);
         }
-        if (ServiceUtils.isNotEmpty(user.getEmail())) {
-            if (!ServiceUtils.isValidMail(user.getEmail())) {
-                throw new ApiServiceException("email invalid");
-            }
+
+        if (!ServiceUtils.isValidMail(user.getEmail())) {
+            throw new ApiServiceException("email invalid");
+        }
+        if (userService.checkEmailExisted(user.getEmail())) {
+            throw new ApiServiceException("email existed");
         }
         User existedUser = userService.findByUsername(user.getUsername());
-        if (existedUser != null) {
+        if (ServiceUtils.isNotEmpty(existedUser)) {
             throw new ApiServiceException(Constant.USER_CREATE_EXISTING);
         }
         userService.save(user);
-        response = Response.builder()
+        mailSendingService.mailConfirmRegister(user.getEmail(), user.getDisplay_name(), user.getId());
+        Response response = Response.builder()
                 .code(Constant.SUCCESS_CODE)
                 .message(Constant.SUCCESSFUL_MESSAGE)
                 .build();

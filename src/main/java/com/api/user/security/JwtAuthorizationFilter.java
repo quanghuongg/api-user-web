@@ -1,6 +1,7 @@
 package com.api.user.security;
 
 import com.api.user.define.Constant;
+import com.api.user.exception.ApiServiceException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +40,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             authToken = header.replace(Constant.SecurityConstant.TOKEN_PREFIX, "");
 
             try {
-                username = jwtTokenProvider.getUsernameFromToken(authToken);
+                try {
+                    username = jwtTokenProvider.getUsernameFromToken(authToken);
+                } catch (ApiServiceException e) {
+                    e.printStackTrace();
+                }
             } catch (IllegalArgumentException e) {
                 log.error("CUSTOM LOGGER ----------- An error occured during getting username and password", e);
             } catch (ExpiredJwtException e) {
@@ -54,15 +59,19 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-            if (jwtTokenProvider.validateToken(authToken, userDetails)) {
-                UsernamePasswordAuthenticationToken authentication = jwtTokenProvider.getAuthentication(
-                        authToken,
-                        SecurityContextHolder.getContext().getAuthentication(),
-                        userDetails
-                );
+            try {
+                if (jwtTokenProvider.validateToken(authToken, userDetails)) {
+                    UsernamePasswordAuthenticationToken authentication = jwtTokenProvider.getAuthentication(
+                            authToken,
+                            SecurityContextHolder.getContext().getAuthentication(),
+                            userDetails
+                    );
 
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            } catch (ApiServiceException e) {
+                e.printStackTrace();
             }
         }
         filterChain.doFilter(request, response);

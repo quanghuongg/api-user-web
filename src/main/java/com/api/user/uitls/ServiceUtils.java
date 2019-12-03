@@ -14,8 +14,12 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
 @Slf4j
 public class ServiceUtils {
+    public static String generateRandomString() {
+        return UUID.randomUUID().toString().replace("-", "").substring(0, 10);
+    }
 
     public static boolean isValidMail(String email) {
         String regex = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";

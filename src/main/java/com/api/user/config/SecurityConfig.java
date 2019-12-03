@@ -50,12 +50,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.sessionManagement().maximumSessions(1).sessionRegistry(sessionRegistry());
         // Pages to be permitted (NO ROLE)
-        http.authorizeRequests().antMatchers("/", "/login", "/logout","/register","/get-token").permitAll();
+        http.authorizeRequests().antMatchers("/", "/login", "/logout", "/register", "/get-token",
+                "/confirm-register", "/reset-password", "/social-login").permitAll();
 
         http.cors().and().csrf().disable()
-            .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-            .sessionManagement()
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.addFilterBefore(customUsernamePasswordFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(authorizationFilterBean(), UsernamePasswordAuthenticationFilter.class);
@@ -65,10 +66,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public SessionRegistry sessionRegistry() {
         return new SessionRegistryImpl();
     }
+
     @Bean
     public ServletListenerRegistrationBean<HttpSessionEventPublisher> httpSessionEventPublisher() {
         return new ServletListenerRegistrationBean<HttpSessionEventPublisher>(new HttpSessionEventPublisher());
     }
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder());

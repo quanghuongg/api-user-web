@@ -1,6 +1,7 @@
 package com.api.user.security;
 
 import com.api.user.define.Constant;
+import com.api.user.exception.ApiServiceException;
 import io.jsonwebtoken.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,27 +19,31 @@ import java.util.stream.Collectors;
 
 @Component
 public class TokenProvider {
-    public String getUsernameFromToken(String token) {
+    public String getUsernameFromToken(String token) throws ApiServiceException {
         return getClaimFromToken(token, Claims::getSubject);
     }
 
-    public Date getExpirationDateFromToken(String token) {
+    public Date getExpirationDateFromToken(String token) throws ApiServiceException {
         return getClaimFromToken(token, Claims::getExpiration);
     }
 
-    public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
+    public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) throws ApiServiceException {
         final Claims claims = getAllClaimsFromToken(token);
         return claimsResolver.apply(claims);
     }
 
-    private Claims getAllClaimsFromToken(String token) {
-        return Jwts.parser()
-                .setSigningKey(Constant.SecurityConstant.JWT_SECRET)
-                .parseClaimsJws(token)
-                .getBody();
+    private Claims getAllClaimsFromToken(String token) throws ApiServiceException {
+        try {
+            return Jwts.parser()
+                    .setSigningKey(Constant.SecurityConstant.JWT_SECRET)
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (Exception e) {
+            throw new ApiServiceException(e.getMessage());
+        }
     }
 
-    public Boolean isTokenExpired(String token) {
+    public Boolean isTokenExpired(String token) throws ApiServiceException {
         final Date expiration = getExpirationDateFromToken(token);
         return expiration.before(new Date());
     }
@@ -57,7 +62,7 @@ public class TokenProvider {
                 .compact();
     }
 
-    public Boolean validateToken(String token, UserDetails userDetails) {
+    public Boolean validateToken(String token, UserDetails userDetails) throws ApiServiceException {
         return (!isTokenExpired(token));
     }
 

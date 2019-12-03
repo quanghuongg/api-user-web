@@ -26,7 +26,7 @@ public class ExceptionHandlerController {
         LOG.error(e.getMessage(), e);
         Response responseObject = Response.builder()
                 .code(Constant.FAILED_CODE)
-                .message("Internal Error")
+                .message(e.getMessage())
                 .build();
         return new ResponseEntity<>(responseObject, HttpStatus.BAD_REQUEST);
     }

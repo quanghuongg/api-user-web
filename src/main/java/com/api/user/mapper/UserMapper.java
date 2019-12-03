@@ -12,11 +12,13 @@ public interface UserMapper {
     @Select("select * from user")
     List<User> findUserAll();
 
-    @Select("select * from role")
-    List<Role> findRoleAll();
 
-    @Select("select * from user WHERE username = #{username} ")
+    @Select("select * from user WHERE username = #{username} AND status=1 ")
     User findUserByName(String username);
+
+
+    @Update("UPDATE user SET  password = #{password}, display_name =#{display_name}, status = #{status} WHERE id = #{id}")
+    void update(User user);
 
 
     @Insert("insert into user(username,display_name,password,status,phone,email,address,avatar,expired,created,updated) " +
@@ -44,4 +46,13 @@ public interface UserMapper {
 
     @Select("select * from user_role WHERE user_id = #{user_id} limit 1")
     UserRole getUserRole(Integer user_id);
+
+    @Select("select * from user WHERE id = #{userId}")
+    User findByUserId(int userId);
+
+    @Select("select * from user WHERE email = #{email}")
+    User findByEmail(String email);
+
+    @Select("select email from user")
+    List<String> listEmail();
 }
