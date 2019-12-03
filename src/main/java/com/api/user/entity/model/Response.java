@@ -1,13 +1,12 @@
 package com.api.user.entity.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
-@Getter
-@Setter
 public class Response {
     @JsonProperty("code")
     private int code = 0;
