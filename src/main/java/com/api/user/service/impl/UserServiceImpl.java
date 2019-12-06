@@ -3,6 +3,7 @@ package com.api.user.service.impl;
 import com.api.user.entity.Role;
 import com.api.user.entity.User;
 import com.api.user.entity.UserRole;
+import com.api.user.entity.info.UserInfo;
 import com.api.user.mapper.UserMapper;
 import com.api.user.service.UserService;
 import com.api.user.uitls.ServiceUtils;
@@ -49,6 +50,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public List<User> getAll() {
         return userMapper.findUserAll();
+    }
+
+    @Override
+    public UserInfo findById(int userId) {
+        return null;
     }
 
     @Override

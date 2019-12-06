@@ -37,8 +37,8 @@ import static springfox.documentation.schema.AlternateTypeRules.newRule;
 public class SwaggerConfig {
 
     public static final ApiInfo DEFAULT_API_INFO = new ApiInfo(
-            "REVIEWER TOOL", "API Description", "1.0",
-            "urn:tos", "VTTC HCM",
+            "API-USER", "API Description", "1.0",
+            "urn:tos", "SBTC01",
             "Apache 2.0", "http://www.apache.org/licenses/LICENSE-2.0");
 
     @Bean
@@ -120,6 +120,7 @@ public class SwaggerConfig {
     private Predicate<String> paths() {
         return or(
                 regex("/social-login.*"),
+                regex("/manager.*"),
                 regex("/user.*"));
     }
 }

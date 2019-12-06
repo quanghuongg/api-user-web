@@ -36,7 +36,7 @@ public interface UserMapper {
     @Delete("delete from user_role WHERE user_id = #{user_id}")
     void deleteUserRole(Integer user_id);
 
-    @Select("select * from user_role , role WHERE user_id = #{user_id} and user_role.role_id = role.id limit 1 ")
+    @Select("select  role.id, role.name from user_role , role WHERE user_id = #{user_id} and user_role.role_id = role.id limit 1 ")
     Role findRoleByUserId(Integer user_id);
 
     @Insert("insert into user_role(user_id,role_id) values(#{user_id},#{role_id})")
