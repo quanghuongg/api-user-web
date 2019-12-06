@@ -2,11 +2,13 @@ package com.api.user.controller;
 
 import com.api.user.define.Constant;
 import com.api.user.entity.Role;
+import com.api.user.entity.Skill;
 import com.api.user.entity.User;
 import com.api.user.entity.model.Response;
 import com.api.user.exception.ApiServiceException;
 import com.api.user.security.TokenProvider;
 import com.api.user.service.MailSendingService;
+import com.api.user.service.ManagerService;
 import com.api.user.service.UserService;
 import com.api.user.uitls.AESUtil;
 import com.api.user.uitls.ServiceUtils;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
 import java.util.Collections;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -34,6 +37,7 @@ public class UserController {
 
     private final MailSendingService mailSendingService;
     private final UserService userService;
+    private final ManagerService managerService;
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -42,9 +46,11 @@ public class UserController {
 
     @Autowired
 
-    public UserController(MailSendingService mailSendingService, UserService userService) {
+    public UserController(MailSendingService mailSendingService, UserService userService
+            , ManagerService managerService) {
         this.mailSendingService = mailSendingService;
         this.userService = userService;
+        this.managerService = managerService;
     }
 
     @RequestMapping(value = {"/get-all"}, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -155,6 +161,17 @@ public class UserController {
                 .code(Constant.SUCCESS_CODE)
                 .message(Constant.SUCCESSFUL_MESSAGE)
                 .data(token)
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping(value = {"/list-skill"})
+    public ResponseEntity<?> getListKill() throws HttpMessageNotReadableException {
+        List<Skill> list = managerService.listSkill();
+        Response response = Response.builder()
+                .code(Constant.SUCCESS_CODE)
+                .message(Constant.SUCCESSFUL_MESSAGE)
+                .data(list)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

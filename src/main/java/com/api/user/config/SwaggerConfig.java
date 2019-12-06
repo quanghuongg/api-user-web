@@ -120,6 +120,7 @@ public class SwaggerConfig {
     private Predicate<String> paths() {
         return or(
                 regex("/social-login.*"),
+                regex("/manager.*"),
                 regex("/user.*"));
     }
 }
