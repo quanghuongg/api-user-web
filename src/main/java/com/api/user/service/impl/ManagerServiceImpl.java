@@ -3,6 +3,7 @@ package com.api.user.service.impl;
 import com.api.user.entity.Role;
 import com.api.user.entity.Skill;
 import com.api.user.entity.User;
+import com.api.user.entity.model.RequestInfo;
 import com.api.user.mapper.ManageMapper;
 import com.api.user.mapper.UserMapper;
 import com.api.user.service.ManagerService;
@@ -56,5 +57,19 @@ public class ManagerServiceImpl implements ManagerService {
     @Override
     public void deleteSkill(Skill skill) {
         manageMapper.updateSkill(skill);
+    }
+
+
+    @Override
+    public List<User> listTutor(RequestInfo requestInfo) {
+        List<User> users = new ArrayList<>();
+        List<User> list = userMapper.findUserByKeyword(requestInfo.getKeyword());
+        for (User user : list) {
+            Role role = userMapper.findRoleByUserId(user.getId());
+            if (role.getId() == 2) {
+                users.add(user);
+            }
+        }
+        return users;
     }
 }

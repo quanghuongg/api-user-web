@@ -25,4 +25,6 @@ public interface UserService {
     User findByEmail(String email);
 
     boolean checkEmailExisted(String email);
+
+    void addSkill(int id, List<Integer> skillIds);
 }

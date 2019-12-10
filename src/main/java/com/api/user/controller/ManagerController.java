@@ -126,6 +126,12 @@ public class ManagerController {
     @RequestMapping(value = {"/list-skill"}, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<?> listSkill(@RequestBody RequestInfo requestInfo) {
+        if (requestInfo.getPage() == 0) {
+            requestInfo.setPage(1);
+        }
+        if (requestInfo.getSize() == 0) {
+            requestInfo.setSize(10);
+        }
         List<Skill> skillList = managerService.listSkill();
         skillList = ServiceUtils.paging(skillList, requestInfo.getPage(), requestInfo.getSize());
         Response responseObject = Response.builder()

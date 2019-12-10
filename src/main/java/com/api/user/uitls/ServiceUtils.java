@@ -14,6 +14,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 public class ServiceUtils {
@@ -32,6 +34,12 @@ public class ServiceUtils {
 
     public static boolean isEmpty(Object object) {
         return ObjectUtils.isEmpty(object);
+    }
+
+    public static boolean isValidPhone(String phone) {
+        Pattern pattern = Pattern.compile("(\\+?84|0)((3([2-9]))|(5([689]))|(7([0|6-9]))|(8([1-9]))|(9([0-9])))([0-9]{7})");
+        Matcher matcher = pattern.matcher(phone);
+        return matcher.matches();
     }
 
     public static final String getStringStream(ServletInputStream stream, int length) throws IOException {

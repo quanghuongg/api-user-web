@@ -4,6 +4,7 @@ import com.api.user.define.Constant;
 import com.api.user.entity.Role;
 import com.api.user.entity.Skill;
 import com.api.user.entity.User;
+import com.api.user.entity.model.RequestInfo;
 import com.api.user.entity.model.Response;
 import com.api.user.exception.ApiServiceException;
 import com.api.user.security.TokenProvider;
@@ -80,6 +81,7 @@ public class UserController {
         Role role = userService.findRoleByUserId(user.getId());
         user.setRole(userService.findRoleByUserId(user.getId()));
         user.setRole_id(role.getId());
+
         response = Response.builder()
                 .code(Constant.SUCCESS_CODE)
                 .message(Constant.SUCCESSFUL_MESSAGE)
@@ -140,6 +142,9 @@ public class UserController {
         if (userService.checkEmailExisted(user.getEmail())) {
             throw new ApiServiceException("email existed");
         }
+        if (!user.getPhone().isEmpty() && !ServiceUtils.isValidPhone(user.getPhone())) {
+            throw new ApiServiceException("phone invalid");
+        }
         User existedUser = userService.findByUsername(user.getUsername());
         if (ServiceUtils.isNotEmpty(existedUser)) {
             throw new ApiServiceException(Constant.USER_CREATE_EXISTING);
@@ -172,6 +177,25 @@ public class UserController {
                 .code(Constant.SUCCESS_CODE)
                 .message(Constant.SUCCESSFUL_MESSAGE)
                 .data(list)
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = {"/add-skill"}, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> addSkill(@RequestBody RequestInfo requestInfo) throws ApiServiceException {
+        Authentication authUser = SecurityContextHolder.getContext().getAuthentication();
+        if (authUser.getName().isEmpty()) {
+            throw new ApiServiceException("Token invalid");
+        }
+        User user = userService.findByUsername(authUser.getName());
+        if (ServiceUtils.isEmpty(user)) {
+            throw new ApiServiceException("User not existed");
+        }
+        userService.addSkill(user.getId(), requestInfo.getSkillIds());
+        Response response = Response.builder()
+                .code(Constant.SUCCESS_CODE)
+                .message(Constant.SUCCESSFUL_MESSAGE)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

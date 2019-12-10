@@ -1,19 +1,19 @@
 package com.api.user.mapper;
 
-import com.api.user.entity.Role;
-import com.api.user.entity.User;
-import com.api.user.entity.UserRole;
+import com.api.user.entity.*;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
 @Mapper
 public interface UserMapper {
-    @Select("select * from user")
+    @Select("SELECT * FROM user")
     List<User> findUserAll();
 
+    @Select("SELECT * FROM user WHERE username LIKE '%' #{keyword} '%'")
+    List<User> findUserByKeyword(String keyword);
 
-    @Select("select * from user WHERE username = #{username} AND status=1 ")
+    @Select("SELECT * FROM user WHERE username = #{username} AND status=1 ")
     User findUserByName(String username);
 
 
@@ -27,16 +27,16 @@ public interface UserMapper {
             before = false, resultType = Integer.class)
     void insertUser(User user);
 
-    @Select("select * from role WHERE name = #{name}")
+    @Select("SELECT * FROM role WHERE name = #{name}")
     Role findRoleByName(String name);
 
-    @Select("select * from role WHERE id = #{id}")
+    @Select("SELECT * FROM role WHERE id = #{id}")
     Role findRoleById(Integer id);
 
-    @Delete("delete from user_role WHERE user_id = #{user_id}")
+    @Delete("delete FROM user_role WHERE user_id = #{user_id}")
     void deleteUserRole(Integer user_id);
 
-    @Select("select  role.id, role.name from user_role , role WHERE user_id = #{user_id} and user_role.role_id = role.id limit 1 ")
+    @Select("SELECT  role.id, role.name FROM user_role , role WHERE user_id = #{user_id} and user_role.role_id = role.id limit 1 ")
     Role findRoleByUserId(Integer user_id);
 
     @Insert("insert into user_role(user_id,role_id) values(#{user_id},#{role_id})")
@@ -44,15 +44,23 @@ public interface UserMapper {
             before = false, resultType = Integer.class)
     void insertUserRole(UserRole userRole);
 
-    @Select("select * from user_role WHERE user_id = #{user_id} limit 1")
+    @Select("SELECT * FROM user_role WHERE user_id = #{user_id} limit 1")
     UserRole getUserRole(Integer user_id);
 
-    @Select("select * from user WHERE id = #{userId}")
+    @Select("SELECT * FROM user WHERE id = #{userId}")
     User findByUserId(int userId);
 
-    @Select("select * from user WHERE email = #{email}")
+    @Select("SELECT * FROM user WHERE email = #{email}")
     User findByEmail(String email);
 
-    @Select("select email from user")
+    @Select("SELECT email FROM user")
     List<String> listEmail();
+
+    @Insert("insert into user_skill(user_id,skill_id) values(#{user_id},#{skill_id})")
+    @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyProperty = "id",
+            before = false, resultType = Integer.class)
+    void insertUserSkill(UserSkill userSkill);
+
+    @Select("SELECT s FROM user_skill us INNER JOIN skill s WHERE us.user_id =#{userId} AND us.skill_id = s.id")
+    List<Skill> listSkillByUser(int  userId);
 }

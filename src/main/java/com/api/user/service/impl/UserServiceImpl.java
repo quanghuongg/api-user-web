@@ -1,9 +1,8 @@
 package com.api.user.service.impl;
 
-import com.api.user.entity.Role;
-import com.api.user.entity.User;
-import com.api.user.entity.UserRole;
+import com.api.user.entity.*;
 import com.api.user.entity.info.UserInfo;
+import com.api.user.mapper.ManageMapper;
 import com.api.user.mapper.UserMapper;
 import com.api.user.service.UserService;
 import com.api.user.uitls.ServiceUtils;
@@ -17,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service(value = "userService")
@@ -25,8 +25,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     private UserMapper userMapper;
 
-    public UserServiceImpl(UserMapper userMapper) {
+    private ManageMapper manageMapper;
+
+    public UserServiceImpl(UserMapper userMapper, ManageMapper manageMapper) {
         this.userMapper = userMapper;
+        this.manageMapper = manageMapper;
     }
 
     @Override
@@ -77,7 +80,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public User findByUsername(String username) {
-        return userMapper.findUserByName(username);
+        User user = userMapper.findUserByName(username);
+        //Get list Skill
+        user.setSkills(userMapper.listSkillByUser(user.getId()));
+        return user;
     }
 
     @Override
@@ -100,5 +106,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public boolean checkEmailExisted(String email) {
         List<String> list = userMapper.listEmail();
         return list.contains(email);
+    }
+
+    @Override
+    public void addSkill(int userId, List<Integer> skillIds) {
+        List<Skill> list = manageMapper.listAllSkill();
+        if (skillIds.size() > 0) {
+            for (int skillId : skillIds) {
+                if (list.stream().map(trans -> trans.getId()).collect(Collectors.toList()).contains(skillIds)) {
+                    userMapper.insertUserSkill(new UserSkill(userId, skillId));
+                }
+            }
+        }
     }
 }
