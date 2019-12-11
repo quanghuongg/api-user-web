@@ -63,7 +63,7 @@ public class ManagerServiceImpl implements ManagerService {
     @Override
     public List<User> listTutor(RequestInfo requestInfo) {
         List<User> users = new ArrayList<>();
-        List<User> list = userMapper.findUserByKeyword(requestInfo.getKeyword());
+        List<User> list = userMapper.findUserByKeyword(requestInfo.getKeyword(), requestInfo.getOrderBy());
         for (User user : list) {
             Role role = userMapper.findRoleByUserId(user.getId());
             if (role.getId() == 2) {

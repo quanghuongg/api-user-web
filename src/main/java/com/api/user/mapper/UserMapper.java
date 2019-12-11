@@ -10,14 +10,16 @@ public interface UserMapper {
     @Select("SELECT * FROM user")
     List<User> findUserAll();
 
-    @Select("SELECT * FROM user WHERE username LIKE '%' #{keyword} '%'")
-    List<User> findUserByKeyword(String keyword);
+    @Select("SELECT * FROM user WHERE username LIKE '%' #{keyword} '%' OR hourly_wage LIKE '%' #{keyword} '%'" +
+            "OR address LIKE '%' #{keyword} '%' OR display_name LIKE '%' #{keyword} '%' ORDER BY user.username ${oderBy}")
+    List<User> findUserByKeyword(String keyword, String oderBy);
 
     @Select("SELECT * FROM user WHERE username = #{username} AND status=1 ")
     User findUserByName(String username);
 
 
-    @Update("UPDATE user SET  password = #{password}, display_name =#{display_name}, status = #{status} WHERE id = #{id}")
+    @Update("UPDATE user SET  password = #{password}, display_name =#{display_name}, phone =#{phone}, status = #{status} " +
+            ", email =#{email}, address =#{address}, avatar =#{avatar} , hourly_wage =#{hourly_wage}, description =#{description} WHERE id = #{id}")
     void update(User user);
 
 
@@ -61,6 +63,6 @@ public interface UserMapper {
             before = false, resultType = Integer.class)
     void insertUserSkill(UserSkill userSkill);
 
-    @Select("SELECT s FROM user_skill us INNER JOIN skill s WHERE us.user_id =#{userId} AND us.skill_id = s.id")
+    @Select("SELECT skill.id, skill.name, skill.description FROM user_skill, skill WHERE user_skill.user_id =#{userId} AND user_skill.skill_id = skill.id")
     List<Skill> listSkillByUser(int  userId);
 }

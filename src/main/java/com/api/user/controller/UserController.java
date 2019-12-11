@@ -132,7 +132,7 @@ public class UserController {
     public ResponseEntity<?> registerUser(@RequestBody User user) throws ApiServiceException, MessagingException {
         if (user.getUsername().isEmpty() || user.getPassword().isEmpty() || user.getRole_id() == 0 || ServiceUtils.isEmpty(user.getEmail())
                 || ServiceUtils.isEmpty(user.getEmail())
-                || ServiceUtils.isEmpty(user.getDisplay_name())) {
+        ) {
             throw new ApiServiceException(Constant.OBJECT_EMPTY_FIELD);
         }
 
@@ -142,9 +142,12 @@ public class UserController {
         if (userService.checkEmailExisted(user.getEmail())) {
             throw new ApiServiceException("email existed");
         }
-        if (!user.getPhone().isEmpty() && !ServiceUtils.isValidPhone(user.getPhone())) {
-            throw new ApiServiceException("phone invalid");
+        if (user.getPhone() != null) {
+            if (!ServiceUtils.isValidPhone(user.getPhone())) {
+                throw new ApiServiceException("phone invalid");
+            }
         }
+
         User existedUser = userService.findByUsername(user.getUsername());
         if (ServiceUtils.isNotEmpty(existedUser)) {
             throw new ApiServiceException(Constant.USER_CREATE_EXISTING);
@@ -184,6 +187,9 @@ public class UserController {
     @RequestMapping(value = {"/add-skill"}, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<?> addSkill(@RequestBody RequestInfo requestInfo) throws ApiServiceException {
+        if (requestInfo.getSkillIds().size() == 0) {
+            throw new ApiServiceException("skillIds null ");
+        }
         Authentication authUser = SecurityContextHolder.getContext().getAuthentication();
         if (authUser.getName().isEmpty()) {
             throw new ApiServiceException("Token invalid");
@@ -199,5 +205,58 @@ public class UserController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @RequestMapping(value = {"/update"}, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> updateUser(@RequestBody User user) throws ApiServiceException {
+        Authentication authUser = SecurityContextHolder.getContext().getAuthentication();
+        if (authUser.getName().isEmpty()) {
+            throw new ApiServiceException("Token invalid");
+        }
+        User existedUser = userService.findByUsername(authUser.getName());
+        if (ServiceUtils.isEmpty(existedUser)) {
+            throw new ApiServiceException("User not existed");
+        }
+        if (ServiceUtils.isNotEmpty(user.getDisplay_name())) {
+            existedUser.setDisplay_name(user.getDisplay_name());
+        }
+        if (ServiceUtils.isNotEmpty(user.getEmail())) {
+            if (!ServiceUtils.isValidMail(user.getEmail())) {
+                throw new ApiServiceException("email invalid");
+            }
+            existedUser.setEmail(user.getEmail());
+        }
+        if (ServiceUtils.isNotEmpty(user.getPassword())) {
+            existedUser.setPassword(ServiceUtils.encodePassword(user.getPassword()));
+        }
+        if (ServiceUtils.isNotEmpty(user.getPhone())) {
+            if (!ServiceUtils.isValidPhone(user.getPhone())) {
+                throw new ApiServiceException("phone invalid");
+            }
+            existedUser.setPhone(user.getPhone());
+        }
+        if (ServiceUtils.isNotEmpty(user.getAddress())) {
+            existedUser.setAddress(user.getAddress());
+        }
+        if (ServiceUtils.isNotEmpty(user.getAvatar())) {
+            existedUser.setAvatar(user.getAvatar());
+        }
+        if (ServiceUtils.isNotEmpty(user.getHourly_wage()) && user.getHourly_wage()!=0) {
+            existedUser.setHourly_wage(user.getHourly_wage());
+        }
+        if (ServiceUtils.isNotEmpty(user.getStatus()) && user.getStatus()!=0) {
+            existedUser.setStatus(user.getStatus());
+        }
+        if (ServiceUtils.isNotEmpty(user.getDescription())) {
+            existedUser.setDescription(user.getDescription());
+        }
+        userService.update(existedUser);
+        Response response = Response.builder()
+                .code(Constant.SUCCESS_CODE)
+                .message(Constant.SUCCESSFUL_MESSAGE)
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 }
 

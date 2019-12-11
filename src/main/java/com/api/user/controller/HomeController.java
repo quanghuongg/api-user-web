@@ -32,6 +32,12 @@ public class HomeController {
         if (requestInfo.getSize() == 0) {
             requestInfo.setSize(10);
         }
+        if (ServiceUtils.isEmpty(requestInfo.getKeyword())) {
+            requestInfo.setKeyword("");
+        }
+        if (ServiceUtils.isEmpty(requestInfo.getOrderBy())) {
+            requestInfo.setOrderBy("DESC");
+        }
         List<User> list = managerService.listTutor(requestInfo);
         list = ServiceUtils.paging(list, requestInfo.getPage(), requestInfo.getSize());
         Response responseObject = Response.builder()

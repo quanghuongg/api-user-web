@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
-public class User   {
+public class User {
     private Integer id;
 
     private String username;
@@ -31,7 +31,7 @@ public class User   {
 
     private String avatar;
 
-    private  long expired;
+    private long expired;
 
     private int status;
 
@@ -39,6 +39,11 @@ public class User   {
 
     private long updated;
 
+    private double hourly_wage;
+
+    private String description;
+
+    //Add  more
     private int role_id;
 
     private Role role;

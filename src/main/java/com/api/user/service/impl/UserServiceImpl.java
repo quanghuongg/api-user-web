@@ -82,7 +82,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public User findByUsername(String username) {
         User user = userMapper.findUserByName(username);
         //Get list Skill
-        user.setSkills(userMapper.listSkillByUser(user.getId()));
+        if (ServiceUtils.isNotEmpty(user))
+            user.setSkills(userMapper.listSkillByUser(user.getId()));
         return user;
     }
 
@@ -113,7 +114,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         List<Skill> list = manageMapper.listAllSkill();
         if (skillIds.size() > 0) {
             for (int skillId : skillIds) {
-                if (list.stream().map(trans -> trans.getId()).collect(Collectors.toList()).contains(skillIds)) {
+                if (list.stream().map(trans -> trans.getId()).collect(Collectors.toList()).contains(skillId)) {
                     userMapper.insertUserSkill(new UserSkill(userId, skillId));
                 }
             }
