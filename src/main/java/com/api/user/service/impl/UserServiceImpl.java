@@ -55,10 +55,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userMapper.findUserAll();
     }
 
-    @Override
-    public UserInfo findById(int userId) {
-        return null;
-    }
 
     @Override
     public int save(User user) {
@@ -89,7 +85,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public User findByUserId(int userId) {
-        return userMapper.findByUserId(userId);
+        User user = userMapper.findByUserId(userId);
+        if (ServiceUtils.isNotEmpty(user))
+            user.setSkills(userMapper.listSkillByUser(user.getId()));
+        return user;
     }
 
     @Override

@@ -2,15 +2,12 @@ package com.api.user.service;
 
 import com.api.user.entity.Role;
 import com.api.user.entity.User;
-import com.api.user.entity.info.UserInfo;
 
 import java.util.List;
 
 public interface UserService {
 
     List<User> getAll();
-
-    UserInfo findById(int userId);
 
     int save(User user);
 

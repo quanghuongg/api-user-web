@@ -80,7 +80,7 @@ public class ManagerController {
         }
         Response responseObject = Response.builder()
                 .code(0)
-                .data(userService.findById(userId))
+                .data(userService.findByUserId(userId))
                 .message("success")
                 .build();
         return new ResponseEntity<>(responseObject, HttpStatus.OK);
