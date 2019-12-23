@@ -8,6 +8,7 @@ import com.api.user.entity.model.RequestInfo;
 import com.api.user.entity.model.Response;
 import com.api.user.exception.ApiServiceException;
 import com.api.user.security.TokenProvider;
+import com.api.user.service.ContractService;
 import com.api.user.service.MailSendingService;
 import com.api.user.service.ManagerService;
 import com.api.user.service.UserService;
@@ -39,6 +40,8 @@ public class UserController {
     private final MailSendingService mailSendingService;
     private final UserService userService;
     private final ManagerService managerService;
+    private final ContractService contractService;
+
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -47,11 +50,12 @@ public class UserController {
 
     @Autowired
 
-    public UserController(MailSendingService mailSendingService, UserService userService
+    public UserController(MailSendingService mailSendingService, UserService userService, ContractService contractService
             , ManagerService managerService) {
         this.mailSendingService = mailSendingService;
         this.userService = userService;
         this.managerService = managerService;
+        this.contractService = contractService;
     }
 
     @RequestMapping(value = {"/get-all"}, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -241,10 +245,10 @@ public class UserController {
         if (ServiceUtils.isNotEmpty(user.getAvatar())) {
             existedUser.setAvatar(user.getAvatar());
         }
-        if (ServiceUtils.isNotEmpty(user.getHourly_wage()) && user.getHourly_wage()!=0) {
+        if (ServiceUtils.isNotEmpty(user.getHourly_wage()) && user.getHourly_wage() != 0) {
             existedUser.setHourly_wage(user.getHourly_wage());
         }
-        if (ServiceUtils.isNotEmpty(user.getStatus()) && user.getStatus()!=0) {
+        if (ServiceUtils.isNotEmpty(user.getStatus()) && user.getStatus() != 0) {
             existedUser.setStatus(user.getStatus());
         }
         if (ServiceUtils.isNotEmpty(user.getDescription())) {
@@ -257,6 +261,7 @@ public class UserController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
 
 }
 

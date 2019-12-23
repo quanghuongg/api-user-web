@@ -29,6 +29,9 @@ public class ManagerServiceImpl implements ManagerService {
     public List<User> getAllUser(int type) {
         List<User> users = new ArrayList<>();
         List<User> list = userMapper.findUserAll();
+        if (type == -1) {
+            return list;
+        }
         for (User user : list) {
             Role role = userMapper.findRoleByUserId(user.getId());
             if (role.getId() == type) {

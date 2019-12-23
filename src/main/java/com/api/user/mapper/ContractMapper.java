@@ -1,0 +1,31 @@
+package com.api.user.mapper;
+
+import com.api.user.entity.Contract;
+import org.apache.ibatis.annotations.*;
+
+import java.util.List;
+
+@Mapper
+public interface ContractMapper {
+
+    @Insert("insert into contract(student_id,tutor_id, description,number_hour,date_from,date_to,created,updated,total,status) " +
+            "values(#{student_id},#{tutor_id},#{description},#{number_hour},#{date_from},#{date_to},#{created},#{updated},#{total},#{status})")
+    @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyProperty = "id",
+            before = false, resultType = Integer.class)
+    void createContract(Contract contract);
+
+    @Select("SELECT * FROM contract WHERE id = #{id}")
+    Contract findById(Integer id);
+
+    @Update("UPDATE contract SET  status = #{status}, updated =#{updated} WHERE id = #{id}")
+    void update(Contract contract);
+
+    @Select("SELECT * FROM contract WHERE student_id = #{id}")
+    List<Contract> listContractByStudentId(Integer id);
+
+    @Select("SELECT * FROM contract WHERE tutor_id = #{id}")
+    List<Contract> listContractByTutorId(Integer id);
+
+    @Select("SELECT * FROM contract WHERE tutor_id = #{id} AND status=2 AND updated >=#{date_from} AND updated >=#{date_to} ")
+    List<Contract> listContractByTime(Integer id, long date_from, long date_to);
+}

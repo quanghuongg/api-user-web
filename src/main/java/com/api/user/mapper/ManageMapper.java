@@ -1,7 +1,6 @@
 package com.api.user.mapper;
 
 import com.api.user.entity.Skill;
-import com.api.user.entity.User;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
