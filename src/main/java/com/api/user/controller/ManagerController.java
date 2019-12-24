@@ -1,6 +1,7 @@
 package com.api.user.controller;
 
 import com.api.user.define.Constant;
+import com.api.user.entity.Contract;
 import com.api.user.entity.Skill;
 import com.api.user.entity.User;
 import com.api.user.entity.model.RequestInfo;
@@ -38,7 +39,7 @@ public class ManagerController {
     @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value = {"/add-admin"}, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> registerUser(@RequestBody User user) throws ApiServiceException {
+    public ResponseEntity<?> addAdmin(@RequestBody User user) throws ApiServiceException {
         if (user.getUsername().isEmpty() || user.getPassword().isEmpty()) {
             throw new ApiServiceException(Constant.OBJECT_EMPTY_FIELD);
         }
@@ -47,11 +48,14 @@ public class ManagerController {
         if (ServiceUtils.isNotEmpty(existedUser)) {
             throw new ApiServiceException(Constant.USER_CREATE_EXISTING);
         }
+        if (user.getDisplay_name() == null) {
+            user.setDisplay_name(user.getUsername());
+        }
         user.setRole_id(3);
         userService.save(user);
         Response response = Response.builder()
                 .code(Constant.SUCCESS_CODE)
-                .message(Constant.SUCCESSFUL_MESSAGE)
+                .message(Constant.SUCCESS_MESSAGE)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -61,12 +65,18 @@ public class ManagerController {
     @RequestMapping(value = {"/list-user"}, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<?> getAllUser(@RequestBody RequestInfo requestInfo) {
-        List<User> list = managerService.getAllUser(requestInfo.getType());
+        if (requestInfo.getPage() == 0) {
+            requestInfo.setPage(1);
+        }
+        if (requestInfo.getSize() == 0) {
+            requestInfo.setSize(10);
+        }
+        List<User> list = managerService.getAllUser(requestInfo.getRoleId());
         list = ServiceUtils.paging(list, requestInfo.getPage(), requestInfo.getSize());
         Response responseObject = Response.builder()
                 .code(0)
                 .data(list)
-                .message("success")
+                .message(Constant.SUCCESS_MESSAGE)
                 .build();
         return new ResponseEntity<>(responseObject, HttpStatus.OK);
     }
@@ -81,7 +91,7 @@ public class ManagerController {
         Response responseObject = Response.builder()
                 .code(0)
                 .data(userService.findByUserId(userId))
-                .message("success")
+                .message(Constant.SUCCESS_MESSAGE)
                 .build();
         return new ResponseEntity<>(responseObject, HttpStatus.OK);
     }
@@ -94,30 +104,33 @@ public class ManagerController {
             throw new ApiServiceException("empty field");
         }
         skill.setStatus(1);
+        skill.setCreated(System.currentTimeMillis());
         Response responseObject = Response.builder()
                 .code(0)
                 .data(managerService.addSkill(skill))
-                .message("success")
+                .message(Constant.SUCCESS_MESSAGE)
                 .build();
         return new ResponseEntity<>(responseObject, HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @RequestMapping(value = {"/delete-skill"}, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = {"/update-skill"}, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> deleteSkill(@RequestParam int id) throws ApiServiceException {
-        if (id <= 0) {
-            throw new ApiServiceException("empty field");
-        }
-        Skill skill = managerService.findSkillById(id);
-        if (ServiceUtils.isEmpty(skill)) {
+    public ResponseEntity<?> updateSkill(@RequestBody Skill skill) throws ApiServiceException {
+        Skill oldSkill = managerService.findSkillById(skill.getId());
+        if (ServiceUtils.isEmpty(oldSkill)) {
             throw new ApiServiceException("skill not existed");
         }
-        skill.setStatus(0);
-        managerService.deleteSkill(skill);
+        if (ServiceUtils.isNotEmpty(skill.getName())) {
+            oldSkill.setName(skill.getName());
+        }
+        if (ServiceUtils.isNotEmpty(skill.getDescription())) {
+            oldSkill.setDescription(skill.getDescription());
+        }
+        managerService.updateSkill(oldSkill);
         Response responseObject = Response.builder()
                 .code(0)
-                .message("success")
+                .message(Constant.SUCCESS_MESSAGE)
                 .build();
         return new ResponseEntity<>(responseObject, HttpStatus.OK);
     }
@@ -137,7 +150,27 @@ public class ManagerController {
         Response responseObject = Response.builder()
                 .code(0)
                 .data(skillList)
-                .message("success")
+                .message(Constant.SUCCESS_MESSAGE)
+                .build();
+        return new ResponseEntity<>(responseObject, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping(value = {"/list-contact"}, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> getListContract(@RequestBody RequestInfo requestInfo) {
+        if (requestInfo.getPage() == 0) {
+            requestInfo.setPage(1);
+        }
+        if (requestInfo.getSize() == 0) {
+            requestInfo.setSize(10);
+        }
+        List<Contract> list = managerService.getListContract(requestInfo);
+        list = ServiceUtils.paging(list, requestInfo.getPage(), requestInfo.getSize());
+        Response responseObject = Response.builder()
+                .code(0)
+                .data(list)
+                .message(Constant.SUCCESS_MESSAGE)
                 .build();
         return new ResponseEntity<>(responseObject, HttpStatus.OK);
     }

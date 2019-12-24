@@ -10,16 +10,12 @@ public interface UserMapper {
     @Select("SELECT * FROM user")
     List<User> findUserAll();
 
-    @Select("SELECT * FROM user WHERE username LIKE '%' #{keyword} '%' OR hourly_wage LIKE '%' #{keyword} '%'" +
-            "OR address LIKE '%' #{keyword} '%' OR display_name LIKE '%' #{keyword} '%' ORDER BY user.username ${oderBy}")
-    List<User> findUserByKeyword(String keyword, String oderBy);
-
     @Select("SELECT * FROM user WHERE username = #{username} AND status=1 ")
     User findUserByName(String username);
 
 
     @Update("UPDATE user SET  password = #{password}, display_name =#{display_name}, phone =#{phone}, status = #{status} " +
-            ", email =#{email}, address =#{address}, avatar =#{avatar} , hourly_wage =#{hourly_wage}, description =#{description} WHERE id = #{id}")
+            ", email =#{email}, address =#{address}, avatar =#{avatar} , hourly_wage =#{hourly_wage}, description =#{description} ,updated = #{updated} WHERE id = #{id}")
     void update(User user);
 
 
@@ -38,7 +34,7 @@ public interface UserMapper {
     @Delete("delete FROM user_role WHERE user_id = #{user_id}")
     void deleteUserRole(Integer user_id);
 
-    @Select("SELECT  role.id, role.name FROM user_role , role WHERE user_id = #{user_id} and user_role.role_id = role.id limit 1 ")
+    @Select("SELECT  role.* FROM user_role , role WHERE user_id = #{user_id} and user_role.role_id = role.id limit 1 ")
     Role findRoleByUserId(Integer user_id);
 
     @Insert("insert into user_role(user_id,role_id) values(#{user_id},#{role_id})")
@@ -63,6 +59,20 @@ public interface UserMapper {
             before = false, resultType = Integer.class)
     void insertUserSkill(UserSkill userSkill);
 
-    @Select("SELECT skill.id, skill.name, skill.description FROM user_skill, skill WHERE user_skill.user_id =#{userId} AND user_skill.skill_id = skill.id")
-    List<Skill> listSkillByUser(int  userId);
+    @Select("SELECT skill.* FROM user_skill, skill WHERE user_skill.user_id =#{userId} AND user_skill.skill_id = skill.id ")
+    List<Skill> listSkillByUser(int userId);
+
+
+    @Select("<script>" +
+            "SELECT user.* FROM user, user_skill " +
+            "<where>" +
+            "<if test=\"username != null\"> user.username LIKE '%' #{username} '%' OR user.display_name LIKE '%' #{username} '%'</if>" +
+            "<if test=\"address != null\"> user.address LIKE '%' #{address} '%'</if>" +
+            "<if test=\"oderBy != null\"> ORDER BY user.username #{oderBy}</if>" +
+            "<if test=\"skillId != null\"> user_skill.skill_id =#{skillId}</if>" +
+            "<if test=\"skillId != null\"> user_skill.user_id = user.id</if>" +
+            "</where>" +
+            "</script>")
+    List<User> findUserByFilter(@Param("username") String username, @Param("oderBy") String oderBy, @Param("address") String address, @Param("skillId") Integer skillId);
+
 }

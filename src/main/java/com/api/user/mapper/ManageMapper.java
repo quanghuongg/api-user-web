@@ -10,7 +10,6 @@ public interface ManageMapper {
     @Select("select * from skill")
     List<Skill> listAllSkill();
 
-
     @Select("select * from skill WHERE id = #{id} AND status=1 ")
     Skill findSkillById(int id);
 
@@ -18,8 +17,8 @@ public interface ManageMapper {
             "values(#{name},#{description},#{created},#{updated},#{status})")
     @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyProperty = "id",
             before = false, resultType = Integer.class)
-    void indsertSkill(Skill skill);
+    void insertSkill(Skill skill);
 
-    @Update("UPDATE skill SET  name = #{name}, description =#{description}, status = #{status} WHERE id = #{id}")
+    @Update("UPDATE skill SET  name = #{name}, description =#{description}, status = #{status},updated = #{updated} WHERE id = #{id}")
     void updateSkill(Skill skill);
 }

@@ -1,7 +1,6 @@
 package com.api.user.service.impl;
 
 import com.api.user.entity.*;
-import com.api.user.entity.info.UserInfo;
 import com.api.user.mapper.ManageMapper;
 import com.api.user.mapper.UserMapper;
 import com.api.user.service.UserService;
@@ -71,6 +70,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public void update(User user) {
+        user.setUpdated(System.currentTimeMillis());
         userMapper.update(user);
     }
 

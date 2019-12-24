@@ -21,7 +21,7 @@ public class EmptyDataException extends Exception {
 
     public EmptyDataException() {
         this.code = Constant.SUCCESS_CODE;
-        this.message = Constant.SUCCESSFUL_MESSAGE;
+        this.message = Constant.SUCCESS_MESSAGE;
         this.data = new String[0];
     }
 

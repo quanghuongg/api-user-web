@@ -9,17 +9,20 @@ import com.api.user.mapper.FeedbackMapper;
 import com.api.user.mapper.UserMapper;
 import com.api.user.service.ContractService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
+
 @Slf4j
+@Service(value = "contractService")
 public class ContractServiceImpl implements ContractService {
     private ContractMapper contractMapper;
     private UserMapper userMapper;
     private FeedbackMapper feedbackMapper;
 
+    @Autowired
     public ContractServiceImpl(ContractMapper contractMapper, UserMapper userMapper, FeedbackMapper feedbackMapper) {
         this.contractMapper = contractMapper;
         this.userMapper = userMapper;
@@ -62,8 +65,13 @@ public class ContractServiceImpl implements ContractService {
     }
 
     @Override
-    public List<Contract> listContractByTime(Integer id, long date_from, long date_to) {
-        return contractMapper.listContractByTime(id, date_from, date_to);
+    public List<Contract> listRevenueByTime(Integer id, long date_from, long date_to) {
+        return contractMapper.listRevenueByTime(id, date_from, date_to);
+    }
+
+    @Override
+    public List<Contract> listRevenues(Integer userId) {
+        return contractMapper.listRevenues(userId);
     }
 
     @Override

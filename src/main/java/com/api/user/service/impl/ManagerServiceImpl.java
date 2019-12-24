@@ -1,13 +1,16 @@
 package com.api.user.service.impl;
 
+import com.api.user.entity.Contract;
 import com.api.user.entity.Role;
 import com.api.user.entity.Skill;
 import com.api.user.entity.User;
 import com.api.user.entity.model.RequestInfo;
+import com.api.user.mapper.ContractMapper;
 import com.api.user.mapper.ManageMapper;
 import com.api.user.mapper.UserMapper;
 import com.api.user.service.ManagerService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -16,25 +19,41 @@ import java.util.List;
 @Slf4j
 @Service(value = "managerService")
 public class ManagerServiceImpl implements ManagerService {
+
     private UserMapper userMapper;
-
     private ManageMapper manageMapper;
+    private ContractMapper contractMapper;
 
-    public ManagerServiceImpl(UserMapper userMapper, ManageMapper manageMapper) {
+    @Autowired
+    public ManagerServiceImpl(UserMapper userMapper, ManageMapper manageMapper, ContractMapper contractMapper) {
         this.userMapper = userMapper;
         this.manageMapper = manageMapper;
+        this.contractMapper = contractMapper;
     }
 
     @Override
-    public List<User> getAllUser(int type) {
+    public List<User> getAllUser(int roldeId) {
         List<User> users = new ArrayList<>();
         List<User> list = userMapper.findUserAll();
-        if (type == -1) {
+        if (roldeId == 0) {
             return list;
         }
         for (User user : list) {
             Role role = userMapper.findRoleByUserId(user.getId());
-            if (role.getId() == type) {
+            if (role.getId() == roldeId) {
+                users.add(user);
+            }
+        }
+        return users;
+    }
+
+    @Override
+    public List<User> listTutor(RequestInfo requestInfo) {
+        List<User> users = new ArrayList<>();
+        List<User> list = userMapper.findUserByFilter(requestInfo.getName(), requestInfo.getOrderBy(), requestInfo.getAddress(), requestInfo.getSkillId());
+        for (User user : list) {
+            Role role = userMapper.findRoleByUserId(user.getId());
+            if (role.getId() == 2) {
                 users.add(user);
             }
         }
@@ -43,7 +62,7 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public int addSkill(Skill skill) {
-        manageMapper.indsertSkill(skill);
+        manageMapper.insertSkill(skill);
         return skill.getId();
     }
 
@@ -57,22 +76,18 @@ public class ManagerServiceImpl implements ManagerService {
         return manageMapper.findSkillById(id);
     }
 
+
     @Override
-    public void deleteSkill(Skill skill) {
+    public void updateSkill(Skill skill) {
+        skill.setUpdated(System.currentTimeMillis());
         manageMapper.updateSkill(skill);
     }
 
-
     @Override
-    public List<User> listTutor(RequestInfo requestInfo) {
-        List<User> users = new ArrayList<>();
-        List<User> list = userMapper.findUserByKeyword(requestInfo.getKeyword(), requestInfo.getOrderBy());
-        for (User user : list) {
-            Role role = userMapper.findRoleByUserId(user.getId());
-            if (role.getId() == 2) {
-                users.add(user);
-            }
+    public List<Contract> getListContract(RequestInfo requestInfo) {
+        if (requestInfo.getDateFrom() == 0 || requestInfo.getDateTo() == 0) {
+            return contractMapper.getListContract();
         }
-        return users;
+        return contractMapper.getListContractByFilter(requestInfo.getDateFrom(), requestInfo.getDateTo(), requestInfo.getStatusContract());
     }
 }

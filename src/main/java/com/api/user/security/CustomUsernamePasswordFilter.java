@@ -74,7 +74,7 @@ public class CustomUsernamePasswordFilter extends UsernamePasswordAuthentication
         String token = jwtTokenProvider.generateToken(authResult);
         Response responseObject = Response.builder()
                 .code(Constant.SUCCESS_CODE)
-                .message(Constant.SUCCESSFUL_MESSAGE)
+                .message(Constant.SUCCESS_MESSAGE)
                 .data(token)
                 .build();
 

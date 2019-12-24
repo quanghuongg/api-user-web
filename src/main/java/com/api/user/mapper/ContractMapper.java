@@ -26,6 +26,15 @@ public interface ContractMapper {
     @Select("SELECT * FROM contract WHERE tutor_id = #{id}")
     List<Contract> listContractByTutorId(Integer id);
 
-    @Select("SELECT * FROM contract WHERE tutor_id = #{id} AND status=2 AND updated >=#{date_from} AND updated >=#{date_to} ")
-    List<Contract> listContractByTime(Integer id, long date_from, long date_to);
+    @Select("SELECT * FROM contract WHERE tutor_id = #{id} AND status=2 AND updated >=#{date_from} AND updated <=#{date_to} ")
+    List<Contract> listRevenueByTime(Integer id, long date_from, long date_to);
+
+    @Select("SELECT * FROM contract WHERE tutor_id = #{id} AND status=2")
+    List<Contract> listRevenues(Integer userId);
+
+    @Select("SELECT * FROM contract")
+    List<Contract> getListContract();
+
+    @Select("SELECT * FROM contract WHERE created > #{dateFrom} AND created <= #{dateTo} AND status= #{statusContract}")
+    List<Contract> getListContractByFilter(long dateFrom, long dateTo, int statusContract);
 }

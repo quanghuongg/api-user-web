@@ -37,7 +37,7 @@ public class SocialLoginController {
                 String token = socialService.generateToken(userSocial);
                 Response response = Response.builder()
                         .code(Constant.SUCCESS_CODE)
-                        .message(Constant.SUCCESSFUL_MESSAGE)
+                        .message(Constant.SUCCESS_MESSAGE)
                         .data(token)
                         .build();
                 return new ResponseEntity<>(response, HttpStatus.OK);

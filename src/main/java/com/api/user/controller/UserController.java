@@ -88,7 +88,7 @@ public class UserController {
 
         response = Response.builder()
                 .code(Constant.SUCCESS_CODE)
-                .message(Constant.SUCCESSFUL_MESSAGE)
+                .message(Constant.SUCCESS_MESSAGE)
                 .data(user)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -107,7 +107,7 @@ public class UserController {
         userService.update(user);
         Response response = Response.builder()
                 .code(Constant.SUCCESS_CODE)
-                .message(Constant.SUCCESSFUL_MESSAGE)
+                .message(Constant.SUCCESS_MESSAGE)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -126,7 +126,7 @@ public class UserController {
         mailSendingService.mailResetPassword(user.getEmail(), user.getDisplay_name(), newPassword);
         Response response = Response.builder()
                 .code(Constant.SUCCESS_CODE)
-                .message(Constant.SUCCESSFUL_MESSAGE)
+                .message(Constant.SUCCESS_MESSAGE)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -160,7 +160,7 @@ public class UserController {
         mailSendingService.mailConfirmRegister(user.getEmail(), user.getDisplay_name(), user.getId());
         Response response = Response.builder()
                 .code(Constant.SUCCESS_CODE)
-                .message(Constant.SUCCESSFUL_MESSAGE)
+                .message(Constant.SUCCESS_MESSAGE)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -171,7 +171,7 @@ public class UserController {
         String token = jwtTokenProvider.generateToken(socialAuthentication);
         Response response = Response.builder()
                 .code(Constant.SUCCESS_CODE)
-                .message(Constant.SUCCESSFUL_MESSAGE)
+                .message(Constant.SUCCESS_MESSAGE)
                 .data(token)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -182,7 +182,7 @@ public class UserController {
         List<Skill> list = managerService.listSkill();
         Response response = Response.builder()
                 .code(Constant.SUCCESS_CODE)
-                .message(Constant.SUCCESSFUL_MESSAGE)
+                .message(Constant.SUCCESS_MESSAGE)
                 .data(list)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -205,7 +205,7 @@ public class UserController {
         userService.addSkill(user.getId(), requestInfo.getSkillIds());
         Response response = Response.builder()
                 .code(Constant.SUCCESS_CODE)
-                .message(Constant.SUCCESSFUL_MESSAGE)
+                .message(Constant.SUCCESS_MESSAGE)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -257,11 +257,10 @@ public class UserController {
         userService.update(existedUser);
         Response response = Response.builder()
                 .code(Constant.SUCCESS_CODE)
-                .message(Constant.SUCCESSFUL_MESSAGE)
+                .message(Constant.SUCCESS_MESSAGE)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
 
 }
 

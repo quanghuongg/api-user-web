@@ -5,13 +5,12 @@ import com.api.user.uitls.ConfigurationLoader;
 public class Constant {
     public static final String SDF_FORMAT = "yyyy/MM/dd HH:mm:ss";
     public static final int FAILED_CODE = 1;
-    public static final String LOGIN_FAIL = "Login fail";
+    public static final String LOGIN_FAIL = "login fail";
     public static final int SUCCESS_CODE = 0;
-    public static final String SUCCESSFUL_MESSAGE = "Success";
-    public static final String OBJECT_EMPTY_FIELD = "Object empty";
-    public static final String USER_CREATE_EXISTING = "User name created";
-    public static final String USER_NOT_EXITED = "User not exited";
-    public static String FAIL_MESSAGE = "Fail";
+    public static final String SUCCESS_MESSAGE = "success";
+    public static final String OBJECT_EMPTY_FIELD = "object empty";
+    public static final String USER_CREATE_EXISTING = "user name created";
+    public static final String USER_NOT_EXITED = "user not exited";
 
     public static final class MailConfiguration {
         public static final String MAIL_USERNAME = ConfigurationLoader.getInstance().getAsString("mail.username", "quanghuongitus@gmail.com");

@@ -19,7 +19,9 @@ public interface ContractService {
 
     ContractInfo detailContract(int id);
 
-    List<Contract> listContractByTime(Integer id, long date_from, long date_to);
+    List<Contract> listRevenues(Integer userId);
+
+    List<Contract> listRevenueByTime(Integer id, long date_from, long date_to);
 
     //Feedback
     void addFeedback(Feedback feedback);

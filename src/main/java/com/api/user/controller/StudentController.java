@@ -2,6 +2,7 @@ package com.api.user.controller;
 
 import com.api.user.define.Constant;
 import com.api.user.entity.Contract;
+import com.api.user.entity.Feedback;
 import com.api.user.entity.User;
 import com.api.user.entity.info.ContractInfo;
 import com.api.user.entity.info.FeedbackRequest;
@@ -9,8 +10,6 @@ import com.api.user.entity.model.Response;
 import com.api.user.entity.request.ContractRequest;
 import com.api.user.exception.ApiServiceException;
 import com.api.user.service.ContractService;
-import com.api.user.service.MailSendingService;
-import com.api.user.service.ManagerService;
 import com.api.user.service.UserService;
 import com.api.user.uitls.ServiceUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -28,22 +28,19 @@ import java.util.List;
 @RestController
 @RequestMapping(value = {"/user"})
 public class StudentController {
-    private final MailSendingService mailSendingService;
-    private final UserService userService;
-    private final ManagerService managerService;
-    private final ContractService contractService;
 
     @Autowired
-    public StudentController(MailSendingService mailSendingService, UserService userService, ContractService contractService
-            , ManagerService managerService) {
-        this.mailSendingService = mailSendingService;
-        this.userService = userService;
-        this.managerService = managerService;
-        this.contractService = contractService;
-    }
+    private  UserService userService;
 
+    @Autowired
+    private  ContractService contractService;
+
+    @PreAuthorize("hasRole('STUDENT')")
     @RequestMapping(value = {"/register-tutor"}, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> registerCourse(@RequestBody ContractRequest request) throws ApiServiceException {
+        if (request.getTutorId() == 0 || ServiceUtils.isEmpty(userService.findByUserId(request.getTutorId()))) {
+            throw new ApiServiceException("Tutor not found");
+        }
         Authentication authUser = SecurityContextHolder.getContext().getAuthentication();
         if (authUser.getName().isEmpty()) {
             throw new ApiServiceException("Token invalid");
@@ -65,27 +62,29 @@ public class StudentController {
         contractService.save(contract);
         Response response = Response.builder()
                 .code(Constant.SUCCESS_CODE)
-                .message(Constant.SUCCESSFUL_MESSAGE)
+                .message(Constant.SUCCESS_MESSAGE)
                 .data(contract.getId())
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @RequestMapping(value = {"/oay"}, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('STUDENT')")
+    @RequestMapping(value = {"/pay"}, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> studentPay(@RequestParam int contract_id) throws ApiServiceException {
         Contract contract = contractService.findById(contract_id);
         if (ServiceUtils.isNotEmpty(contract)) {
             contract.setStatus(1);
             contract.setUpdated(System.currentTimeMillis());
+            contractService.update(contract);
         }
-        contractService.update(contract);
         Response response = Response.builder()
                 .code(Constant.SUCCESS_CODE)
-                .message(Constant.SUCCESSFUL_MESSAGE)
+                .message(Constant.SUCCESS_MESSAGE)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('STUDENT')")
     @RequestMapping(value = {"/student-contract"}, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> listContract() throws ApiServiceException {
         Authentication authUser = SecurityContextHolder.getContext().getAuthentication();
@@ -96,37 +95,44 @@ public class StudentController {
         List<Contract> contractList = contractService.listContractByStudentId(user.getId());
         Response response = Response.builder()
                 .code(Constant.SUCCESS_CODE)
-                .message(Constant.SUCCESSFUL_MESSAGE)
+                .message(Constant.SUCCESS_MESSAGE)
                 .data(contractList)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('STUDENT')")
     @RequestMapping(value = {"/detail-contract"}, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> detailContract(@RequestParam int id) throws ApiServiceException {
+    public ResponseEntity<?> detailContract(@RequestParam int contract_id) throws ApiServiceException {
         Authentication authUser = SecurityContextHolder.getContext().getAuthentication();
         if (authUser.getName().isEmpty()) {
             throw new ApiServiceException("Token invalid");
         }
-        ContractInfo contractInfo = contractService.detailContract(id);
+        ContractInfo contractInfo = contractService.detailContract(contract_id);
         Response response = Response.builder()
                 .code(Constant.SUCCESS_CODE)
-                .message(Constant.SUCCESSFUL_MESSAGE)
+                .message(Constant.SUCCESS_MESSAGE)
                 .data(contractInfo)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-
+    @PreAuthorize("hasRole('STUDENT')")
     @RequestMapping(value = {"/add-feedback"}, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> detailContract(@RequestBody FeedbackRequest request) throws ApiServiceException {
+    public ResponseEntity<?> addFeedback(@RequestBody FeedbackRequest request) throws ApiServiceException {
         if (ServiceUtils.isEmpty(request.getContractId()) || ServiceUtils.isEmpty(request.getType())) {
             throw new ApiServiceException("Object empty field");
         }
-
+        Feedback feedback = Feedback.builder()
+                .contract_id(request.getContractId())
+                .content(request.getContent())
+                .type(request.getType())
+                .created(System.currentTimeMillis())
+                .build();
+        contractService.addFeedback(feedback);
         Response response = Response.builder()
                 .code(Constant.SUCCESS_CODE)
-                .message(Constant.SUCCESSFUL_MESSAGE)
+                .message(Constant.SUCCESS_MESSAGE)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

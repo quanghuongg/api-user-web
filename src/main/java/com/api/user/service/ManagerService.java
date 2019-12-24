@@ -1,5 +1,6 @@
 package com.api.user.service;
 
+import com.api.user.entity.Contract;
 import com.api.user.entity.Skill;
 import com.api.user.entity.User;
 import com.api.user.entity.model.RequestInfo;
@@ -16,7 +17,9 @@ public interface ManagerService {
 
     Skill findSkillById(int id);
 
-    void deleteSkill(Skill skill);
-
     List<User>listTutor(RequestInfo requestInfo);
+
+    void updateSkill(Skill skill);
+
+    List<Contract> getListContract(RequestInfo requestInfo);
 }

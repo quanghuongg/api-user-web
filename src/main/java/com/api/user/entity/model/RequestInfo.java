@@ -13,9 +13,12 @@ public class RequestInfo {
 
     int size;
 
-    int type;
+    @JsonProperty("role_id")
+    int roleId;
 
-    String keyword;
+    String name;
+
+    String address;
 
     @JsonProperty("sort_by")
     String sortBy;
@@ -25,5 +28,20 @@ public class RequestInfo {
 
     @JsonProperty("skill_ids")
     private List<Integer> skillIds;
+
+
+    @JsonProperty("skill_id")
+    private Integer skillId;
+
+
+    @JsonProperty("date_from")
+    private long dateFrom;
+
+    @JsonProperty("date_to")
+    private long dateTo;
+
+    @JsonProperty("status_contract")
+    private int statusContract;
+
 
 }
