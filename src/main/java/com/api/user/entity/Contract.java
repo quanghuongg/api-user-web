@@ -31,6 +31,11 @@ public class Contract {
     private double total;
 
     private int status;
+
+    private String tutor;
+
+    private String student;
+
 //    0: pending  1: student pay   2 : totur get money
 
 }

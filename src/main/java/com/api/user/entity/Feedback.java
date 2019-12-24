@@ -17,4 +17,9 @@ public class Feedback {
     private int type;
 
     private long created;
+
+    private String student;
+
+    private String tutor;
+
 }

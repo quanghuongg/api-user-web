@@ -32,15 +32,15 @@ public class ManagerServiceImpl implements ManagerService {
     }
 
     @Override
-    public List<User> getAllUser(int roldeId) {
+    public List<User> getAllUser(int roleId) {
         List<User> users = new ArrayList<>();
         List<User> list = userMapper.findUserAll();
-        if (roldeId == 0) {
+        if (roleId == 0) {
             return list;
         }
         for (User user : list) {
             Role role = userMapper.findRoleByUserId(user.getId());
-            if (role.getId() == roldeId) {
+            if (role.getId() == roleId) {
                 users.add(user);
             }
         }

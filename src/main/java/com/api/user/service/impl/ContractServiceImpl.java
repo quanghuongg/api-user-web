@@ -4,6 +4,7 @@ import com.api.user.entity.Contract;
 import com.api.user.entity.Feedback;
 import com.api.user.entity.User;
 import com.api.user.entity.info.ContractInfo;
+import com.api.user.entity.model.RequestInfo;
 import com.api.user.mapper.ContractMapper;
 import com.api.user.mapper.FeedbackMapper;
 import com.api.user.mapper.UserMapper;
@@ -77,5 +78,10 @@ public class ContractServiceImpl implements ContractService {
     @Override
     public void addFeedback(Feedback feedback) {
         feedbackMapper.addFeedback(feedback);
+    }
+
+    @Override
+    public List<Feedback> listFeedBacks(RequestInfo requestInfo) {
+        return feedbackMapper.listFeedBacks();
     }
 }

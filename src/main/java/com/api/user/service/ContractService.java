@@ -3,6 +3,7 @@ package com.api.user.service;
 import com.api.user.entity.Contract;
 import com.api.user.entity.Feedback;
 import com.api.user.entity.info.ContractInfo;
+import com.api.user.entity.model.RequestInfo;
 
 import java.util.List;
 
@@ -25,6 +26,8 @@ public interface ContractService {
 
     //Feedback
     void addFeedback(Feedback feedback);
+
+    List<Feedback> listFeedBacks(RequestInfo requestInfo);
 
 
 }

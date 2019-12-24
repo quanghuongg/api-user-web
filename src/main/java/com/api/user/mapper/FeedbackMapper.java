@@ -3,7 +3,10 @@ package com.api.user.mapper;
 import com.api.user.entity.Feedback;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectKey;
+
+import java.util.List;
 
 @Mapper
 public interface FeedbackMapper {
@@ -12,4 +15,8 @@ public interface FeedbackMapper {
     @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyProperty = "id",
             before = false, resultType = Integer.class)
     void addFeedback(Feedback feedback);
+
+
+    @Select("SELECT * FROM feedback ORDER BY created DESC")
+    List<Feedback> listFeedBacks();
 }

@@ -31,7 +31,7 @@ public class RequestInfo {
 
 
     @JsonProperty("skill_id")
-    private Integer skillId;
+    private int skillId;
 
 
     @JsonProperty("date_from")

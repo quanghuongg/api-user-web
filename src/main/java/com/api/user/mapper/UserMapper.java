@@ -64,15 +64,25 @@ public interface UserMapper {
 
 
     @Select("<script>" +
-            "SELECT user.* FROM user, user_skill " +
-            "<where>" +
-            "<if test=\"username != null\"> user.username LIKE '%' #{username} '%' OR user.display_name LIKE '%' #{username} '%'</if>" +
-            "<if test=\"address != null\"> user.address LIKE '%' #{address} '%'</if>" +
-            "<if test=\"oderBy != null\"> ORDER BY user.username #{oderBy}</if>" +
-            "<if test=\"skillId != null\"> user_skill.skill_id =#{skillId}</if>" +
-            "<if test=\"skillId != null\"> user_skill.user_id = user.id</if>" +
-            "</where>" +
+            "SELECT  distinct user.* FROM user, user_skill WHERE user.updated >=0 AND ( user.username LIKE '%' #{username} '%' OR user.display_name LIKE '%' #{username} '%')" +
+//            "<if test=\"skillId >0\"> AND user_skill.user_id = user.id</if>" +
+            "<if test=\"username != null\"> AND ( user.username LIKE '%' #{username} '%' OR user.display_name LIKE '%' #{username} '%')</if>" +
+//            "<if test=\"address != null\"> AND  user.address LIKE '%' #{address} '%'</if>" +
             "</script>")
+//    @Select("<select id=\"findUserByFilter\"\n" +
+//            "     resultType=\"User\">\n" +
+//            "  SELECT * FROM user, user_skill\n" +
+//            "  WHERE user.updated >=0" +
+//            "  <if test=\"skillId != null\">\n" +
+//            "    user_skill.user_id = user.id\n" +
+//            "  </if>\n" +
+//            "  <if test=\"username != null\">\n" +
+//            "    AND (user.username LIKE '%' #{username} '%' OR user.display_name LIKE '%' #{username} '%')\n" +
+//            "  </if>\n" +
+//            "  <if test=\"address != null and author.name != null\">\n" +
+//            "    AND  user.address LIKE '%' #{address} '%'\n" +
+//            "  </if>\n" +
+//            "</select>")
     List<User> findUserByFilter(@Param("username") String username, @Param("oderBy") String oderBy, @Param("address") String address, @Param("skillId") Integer skillId);
 
 }

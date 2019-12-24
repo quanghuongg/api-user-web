@@ -2,11 +2,13 @@ package com.api.user.controller;
 
 import com.api.user.define.Constant;
 import com.api.user.entity.Contract;
+import com.api.user.entity.Feedback;
 import com.api.user.entity.Skill;
 import com.api.user.entity.User;
 import com.api.user.entity.model.RequestInfo;
 import com.api.user.entity.model.Response;
 import com.api.user.exception.ApiServiceException;
+import com.api.user.service.ContractService;
 import com.api.user.service.ManagerService;
 import com.api.user.service.UserService;
 import com.api.user.uitls.ServiceUtils;
@@ -30,10 +32,13 @@ public class ManagerController {
 
     private final UserService userService;
 
+    private final ContractService contractService;
 
-    public ManagerController(ManagerService managerService, UserService userService) {
+
+    public ManagerController(ManagerService managerService, UserService userService, ContractService contractService) {
         this.managerService = managerService;
         this.userService = userService;
+        this.contractService = contractService;
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -73,6 +78,9 @@ public class ManagerController {
         }
         List<User> list = managerService.getAllUser(requestInfo.getRoleId());
         list = ServiceUtils.paging(list, requestInfo.getPage(), requestInfo.getSize());
+        for (User user : list) {
+            user.setRole_id(userService.findRoleByUserId(user.getId()).getId());
+        }
         Response responseObject = Response.builder()
                 .code(0)
                 .data(list)
@@ -156,7 +164,7 @@ public class ManagerController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @RequestMapping(value = {"/list-contact"}, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = {"list-contract"}, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<?> getListContract(@RequestBody RequestInfo requestInfo) {
         if (requestInfo.getPage() == 0) {
@@ -167,9 +175,80 @@ public class ManagerController {
         }
         List<Contract> list = managerService.getListContract(requestInfo);
         list = ServiceUtils.paging(list, requestInfo.getPage(), requestInfo.getSize());
+        for (Contract contract : list) {
+            contract.setTutor(userService.findByUserId(contract.getTutor_id()).getDisplay_name());
+            contract.setStudent(userService.findByUserId(contract.getStudent_id()).getDisplay_name());
+
+        }
         Response responseObject = Response.builder()
                 .code(0)
                 .data(list)
+                .message(Constant.SUCCESS_MESSAGE)
+                .build();
+        return new ResponseEntity<>(responseObject, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping(value = {"/block"}, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> blockUser(@RequestParam int userId) throws ApiServiceException {
+        if (userId <= 0) {
+            throw new ApiServiceException("userId not found");
+        }
+        User user = userService.findByUserId(userId);
+        if (ServiceUtils.isEmpty(user)) {
+            throw new ApiServiceException("userId not found");
+        }
+        user.setStatus(0);
+        userService.update(user);
+        Response responseObject = Response.builder()
+                .code(0)
+                .message(Constant.SUCCESS_MESSAGE)
+                .build();
+        return new ResponseEntity<>(responseObject, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping(value = {"/un-block"}, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> unBlockUser(@RequestParam int userId) throws ApiServiceException {
+        if (userId <= 0) {
+            throw new ApiServiceException("userId not found");
+        }
+        User user = userService.findByUserId(userId);
+        if (ServiceUtils.isEmpty(user)) {
+            throw new ApiServiceException("userId not found");
+        }
+        user.setStatus(1);
+        userService.update(user);
+        Response responseObject = Response.builder()
+                .code(0)
+                .message(Constant.SUCCESS_MESSAGE)
+                .build();
+        return new ResponseEntity<>(responseObject, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping(value = {"/list-feedback"}, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> listFeedBack(@RequestBody RequestInfo requestInfo) throws ApiServiceException {
+        if (requestInfo.getPage() == 0) {
+            requestInfo.setPage(1);
+        }
+        if (requestInfo.getSize() == 0) {
+            requestInfo.setSize(10);
+        }
+        List<Feedback> feedbackList = contractService.listFeedBacks(requestInfo);
+        feedbackList = ServiceUtils.paging(feedbackList, requestInfo.getPage(), requestInfo.getSize());
+        for (Feedback feedback : feedbackList) {
+            Contract contract = contractService.findById(feedback.getContract_id());
+            User student = userService.findByUserId(contract.getStudent_id());
+            feedback.setStudent(student.getDisplay_name());
+            feedback.setTutor(userService.findByUserId(contract.getTutor_id()).getDisplay_name());
+        }
+        Response responseObject = Response.builder()
+                .code(0)
+                .data(feedbackList)
                 .message(Constant.SUCCESS_MESSAGE)
                 .build();
         return new ResponseEntity<>(responseObject, HttpStatus.OK);
