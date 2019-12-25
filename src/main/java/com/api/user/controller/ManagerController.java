@@ -286,10 +286,10 @@ public class ManagerController {
         List<StatisticSkill> list = null;
         list = contractService.statisticTopSkill(revenueRequest);
         list.sort(Comparator.comparingInt(StatisticSkill::getTotal));
-        if (list.size() > 6) {
-            list = list.subList(0, 6);
-        }
         Collections.reverse(list);
+        if (list.size() > 5) {
+            list = list.subList(0, 5);
+        }
         Response responseObject = Response.builder()
                 .code(0)
                 .data(list)
@@ -305,10 +305,10 @@ public class ManagerController {
         List<StatisticTutor> list = null;
         list = contractService.statisticTopByTutor(revenueRequest);
         list.sort(Comparator.comparingInt(StatisticTutor::getTotal));
-        if (list.size() > 6) {
-            list = list.subList(0, 6);
-        }
         Collections.reverse(list);
+        if (list.size() > 5) {
+            list = list.subList(0, 5);
+        }
         Response responseObject = Response.builder()
                 .code(0)
                 .data(list)

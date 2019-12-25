@@ -3,6 +3,7 @@ package com.api.user.controller;
 import com.api.user.entity.User;
 import com.api.user.entity.model.RequestInfo;
 import com.api.user.entity.model.Response;
+import com.api.user.entity.response.ListUser;
 import com.api.user.exception.ApiServiceException;
 import com.api.user.service.ManagerService;
 import com.api.user.uitls.ServiceUtils;
@@ -36,10 +37,17 @@ public class HomeController {
             requestInfo.setOrderBy("DESC");
         }
         List<User> list = managerService.listTutor(requestInfo);
+        int total = list.size();
         list = ServiceUtils.paging(list, requestInfo.getPage(), requestInfo.getSize());
+        ListUser result = ListUser.builder()
+                .listUser(list)
+                .total(total)
+                .page(requestInfo.getPage())
+                .size(requestInfo.getSize())
+                .build();
         Response responseObject = Response.builder()
                 .code(0)
-                .data(list)
+                .data(result)
                 .message("success")
                 .build();
         return new ResponseEntity<>(responseObject, HttpStatus.OK);
