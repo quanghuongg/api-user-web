@@ -8,8 +8,8 @@ import java.util.List;
 @Mapper
 public interface ContractMapper {
 
-    @Insert("insert into contract(student_id,tutor_id, description,number_hour,date_from,date_to,created,updated,total,status) " +
-            "values(#{student_id},#{tutor_id},#{description},#{number_hour},#{date_from},#{date_to},#{created},#{updated},#{total},#{status})")
+    @Insert("insert into contract(student_id,tutor_id, skills,description,number_hour,date_from,date_to,created,updated,total,status) " +
+            "values(#{student_id},#{tutor_id},#{skills},#{description},#{number_hour},#{date_from},#{date_to},#{created},#{updated},#{total},#{status})")
     @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyProperty = "id",
             before = false, resultType = Integer.class)
     void createContract(Contract contract);

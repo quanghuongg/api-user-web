@@ -30,16 +30,19 @@ import java.util.List;
 public class StudentController {
 
     @Autowired
-    private  UserService userService;
+    private UserService userService;
 
     @Autowired
-    private  ContractService contractService;
+    private ContractService contractService;
 
     @PreAuthorize("hasRole('STUDENT')")
     @RequestMapping(value = {"/register-tutor"}, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> registerCourse(@RequestBody ContractRequest request) throws ApiServiceException {
         if (request.getTutorId() == 0 || ServiceUtils.isEmpty(userService.findByUserId(request.getTutorId()))) {
             throw new ApiServiceException("Tutor not found");
+        }
+        if (request.getSkills() == null || request.getSkills().isEmpty()) {
+            throw new ApiServiceException("Skills null");
         }
         Authentication authUser = SecurityContextHolder.getContext().getAuthentication();
         if (authUser.getName().isEmpty()) {
@@ -48,6 +51,13 @@ public class StudentController {
         User student = userService.findByUsername(authUser.getName());
         User tutor = userService.findByUserId(request.getTutorId());
 
+        String skills = "";
+        for (int i = 0; i < request.getSkills().size(); i++) {
+            skills += request.getSkills().get(i);
+            if (i < (request.getSkills().size() - 1)) {
+                skills += ";";
+            }
+        }
         Contract contract = Contract.builder()
                 .student_id(student.getId())
                 .tutor_id(request.getTutorId())
@@ -58,6 +68,7 @@ public class StudentController {
                 .created(System.currentTimeMillis())
                 .date_from(request.getDateFrom())
                 .date_to(request.getDateTo())
+                .skills(skills)
                 .build();
         contractService.save(contract);
         Response response = Response.builder()

@@ -36,6 +36,8 @@ public class Contract {
 
     private String student;
 
+    private  String skills;
+
 //    0: pending  1: student pay   2 : totur get money
 
 }
