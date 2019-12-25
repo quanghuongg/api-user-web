@@ -7,6 +7,9 @@ import com.api.user.entity.Skill;
 import com.api.user.entity.User;
 import com.api.user.entity.model.RequestInfo;
 import com.api.user.entity.model.Response;
+import com.api.user.entity.model.StatisticSkill;
+import com.api.user.entity.model.StatisticTutor;
+import com.api.user.entity.request.RevenueRequest;
 import com.api.user.exception.ApiServiceException;
 import com.api.user.service.ContractService;
 import com.api.user.service.ManagerService;
@@ -20,6 +23,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Slf4j
@@ -80,7 +85,18 @@ public class ManagerController {
         list = ServiceUtils.paging(list, requestInfo.getPage(), requestInfo.getSize());
         for (User user : list) {
             user.setRole_id(userService.findRoleByUserId(user.getId()).getId());
+            if (ServiceUtils.isNotEmpty(user.getSkills())) {
+                String skills = "";
+                for (int i = 0; i < user.getSkills().size(); i++) {
+                    skills += user.getSkills().get(i).getName();
+                    if (i < user.getSkills().size() - 1) {
+                        skills += ";";
+                    }
+                }
+                user.setList_skill(skills);
+            }
         }
+
         Response responseObject = Response.builder()
                 .code(0)
                 .data(list)
@@ -96,9 +112,18 @@ public class ManagerController {
         if (ServiceUtils.isEmpty(userId)) {
             throw new ApiServiceException("empty field");
         }
+        User user = userService.findByUserId(userId);
+        String skills = "";
+        for (int i = 0; i < user.getSkills().size(); i++) {
+            skills += user.getSkills().get(i).getName();
+            if (i < user.getSkills().size() - 1) {
+                skills += ";";
+            }
+        }
+        user.setList_skill(skills);
         Response responseObject = Response.builder()
                 .code(0)
-                .data(userService.findByUserId(userId))
+                .data(user)
                 .message(Constant.SUCCESS_MESSAGE)
                 .build();
         return new ResponseEntity<>(responseObject, HttpStatus.OK);
@@ -249,6 +274,44 @@ public class ManagerController {
         Response responseObject = Response.builder()
                 .code(0)
                 .data(feedbackList)
+                .message(Constant.SUCCESS_MESSAGE)
+                .build();
+        return new ResponseEntity<>(responseObject, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping(value = {"/revenue-skill"}, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> statisticTopSkill(@RequestBody RevenueRequest revenueRequest) throws ApiServiceException {
+        List<StatisticSkill> list = null;
+        list = contractService.statisticTopSkill(revenueRequest);
+        list.sort(Comparator.comparingInt(StatisticSkill::getTotal));
+        if (list.size() > 6) {
+            list = list.subList(0, 6);
+        }
+        Collections.reverse(list);
+        Response responseObject = Response.builder()
+                .code(0)
+                .data(list)
+                .message(Constant.SUCCESS_MESSAGE)
+                .build();
+        return new ResponseEntity<>(responseObject, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping(value = {"/revenue-tutor"}, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> statisticTopByTutor(@RequestBody RevenueRequest revenueRequest) throws ApiServiceException {
+        List<StatisticTutor> list = null;
+        list = contractService.statisticTopByTutor(revenueRequest);
+        list.sort(Comparator.comparingInt(StatisticTutor::getTotal));
+        if (list.size() > 6) {
+            list = list.subList(0, 6);
+        }
+        Collections.reverse(list);
+        Response responseObject = Response.builder()
+                .code(0)
+                .data(list)
                 .message(Constant.SUCCESS_MESSAGE)
                 .build();
         return new ResponseEntity<>(responseObject, HttpStatus.OK);

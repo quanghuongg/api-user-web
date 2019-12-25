@@ -8,8 +8,8 @@ import java.util.List;
 @Mapper
 public interface ContractMapper {
 
-    @Insert("insert into contract(student_id,tutor_id, skills,description,number_hour,date_from,date_to,created,updated,total,status) " +
-            "values(#{student_id},#{tutor_id},#{skills},#{description},#{number_hour},#{date_from},#{date_to},#{created},#{updated},#{total},#{status})")
+    @Insert("insert into contract(student_id,tutor_id, skill,description,number_hour,date_from,date_to,created,updated,total,status) " +
+            "values(#{student_id},#{tutor_id},#{skill},#{description},#{number_hour},#{date_from},#{date_to},#{created},#{updated},#{total},#{status})")
     @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyProperty = "id",
             before = false, resultType = Integer.class)
     void createContract(Contract contract);
@@ -37,4 +37,17 @@ public interface ContractMapper {
 
     @Select("SELECT * FROM contract WHERE created > #{dateFrom} AND created <= #{dateTo} AND status= #{statusContract}")
     List<Contract> getListContractByFilter(long dateFrom, long dateTo, int statusContract);
+
+    @Select("SELECT * FROM contract WHERE skill = #{skillId} AND created > #{dateFrom} AND created <= #{dateTo} AND status= 2")
+    List<Contract> getListContractDoneBySkillIdByTime(int skillId, long dateFrom, long dateTo);
+
+    @Select("SELECT * FROM contract WHERE skill = #{skillId} AND status= 2")
+    List<Contract> getListContractDoneBySkillId(int skillId);
+
+
+    @Select("SELECT * FROM contract WHERE tutor_id = #{tutorId} AND created > #{dateFrom} AND created <= #{dateTo} AND status= 2")
+    List<Contract> getListContractDoneByTutorIdByTime(int tutorId, long dateFrom, long dateTo);
+
+    @Select("SELECT * FROM contract WHERE tutor_id = #{tutorId} AND status= 2")
+    List<Contract> getListContractDoneByTutorId(int tutorId);
 }

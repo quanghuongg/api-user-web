@@ -50,4 +50,26 @@ public class User {
 
     private List<Skill> skills;
 
+    public User(Integer id, String username, String display_name, String password, String email, String address, String phone, String avatar, long expired, int status, long created, long updated, double hourly_wage, String description, int role_id, Role role, List<Skill> skills) {
+        this.id = id;
+        this.username = username;
+        this.display_name = display_name;
+        this.password = password;
+        this.email = email;
+        this.address = address;
+        this.phone = phone;
+        this.avatar = avatar;
+        this.expired = expired;
+        this.status = status;
+        this.created = created;
+        this.updated = updated;
+        this.hourly_wage = hourly_wage;
+        this.description = description;
+        this.role_id = role_id;
+        this.role = role;
+        this.skills = skills;
+    }
+
+    private String list_skill;
+
 }

@@ -17,9 +17,10 @@ public interface ManagerService {
 
     Skill findSkillById(int id);
 
-    List<User>listTutor(RequestInfo requestInfo);
+    List<User> listTutor(RequestInfo requestInfo);
 
     void updateSkill(Skill skill);
 
     List<Contract> getListContract(RequestInfo requestInfo);
+
 }

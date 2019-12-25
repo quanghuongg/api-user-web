@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-
 @Getter
 @Setter
 public class ContractRequest {
@@ -27,6 +25,6 @@ public class ContractRequest {
 
     private String description;
 
-    List<Integer> skills;
+    private int skill;
 
 }

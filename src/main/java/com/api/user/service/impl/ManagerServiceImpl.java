@@ -35,12 +35,12 @@ public class ManagerServiceImpl implements ManagerService {
     public List<User> getAllUser(int roleId) {
         List<User> users = new ArrayList<>();
         List<User> list = userMapper.findUserAll();
-        if (roleId == 0) {
-            return list;
-        }
         for (User user : list) {
             Role role = userMapper.findRoleByUserId(user.getId());
-            if (role.getId() == roleId) {
+            user.setSkills(userMapper.listSkillByUser(user.getId()));
+            if (roleId == 0) {
+                users.add(user);
+            } else if (role.getId() == roleId) {
                 users.add(user);
             }
         }

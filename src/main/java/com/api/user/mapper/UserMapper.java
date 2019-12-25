@@ -10,6 +10,9 @@ public interface UserMapper {
     @Select("SELECT * FROM user")
     List<User> findUserAll();
 
+    @Select("SELECT user.* FROM user,user_role WHERE user.id = user_role.user_id AND user_role.role_id =2")
+    List<User> findTutorAll();
+
     @Select("SELECT * FROM user WHERE username = #{username} AND status=1 ")
     User findUserByName(String username);
 

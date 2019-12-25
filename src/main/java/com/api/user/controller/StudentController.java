@@ -41,7 +41,7 @@ public class StudentController {
         if (request.getTutorId() == 0 || ServiceUtils.isEmpty(userService.findByUserId(request.getTutorId()))) {
             throw new ApiServiceException("Tutor not found");
         }
-        if (request.getSkills() == null || request.getSkills().isEmpty()) {
+        if (request.getSkill() == 0) {
             throw new ApiServiceException("Skills null");
         }
         Authentication authUser = SecurityContextHolder.getContext().getAuthentication();
@@ -51,13 +51,6 @@ public class StudentController {
         User student = userService.findByUsername(authUser.getName());
         User tutor = userService.findByUserId(request.getTutorId());
 
-        String skills = "";
-        for (int i = 0; i < request.getSkills().size(); i++) {
-            skills += request.getSkills().get(i);
-            if (i < (request.getSkills().size() - 1)) {
-                skills += ";";
-            }
-        }
         Contract contract = Contract.builder()
                 .student_id(student.getId())
                 .tutor_id(request.getTutorId())
@@ -68,7 +61,7 @@ public class StudentController {
                 .created(System.currentTimeMillis())
                 .date_from(request.getDateFrom())
                 .date_to(request.getDateTo())
-                .skills(skills)
+                .skill(request.getSkill())
                 .build();
         contractService.save(contract);
         Response response = Response.builder()

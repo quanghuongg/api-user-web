@@ -2,17 +2,24 @@ package com.api.user.service.impl;
 
 import com.api.user.entity.Contract;
 import com.api.user.entity.Feedback;
+import com.api.user.entity.Skill;
 import com.api.user.entity.User;
 import com.api.user.entity.info.ContractInfo;
 import com.api.user.entity.model.RequestInfo;
+import com.api.user.entity.model.StatisticSkill;
+import com.api.user.entity.model.StatisticTutor;
+import com.api.user.entity.request.RevenueRequest;
 import com.api.user.mapper.ContractMapper;
 import com.api.user.mapper.FeedbackMapper;
+import com.api.user.mapper.ManageMapper;
 import com.api.user.mapper.UserMapper;
 import com.api.user.service.ContractService;
+import com.api.user.uitls.ServiceUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -22,12 +29,14 @@ public class ContractServiceImpl implements ContractService {
     private ContractMapper contractMapper;
     private UserMapper userMapper;
     private FeedbackMapper feedbackMapper;
+    private ManageMapper manageMapper;
 
     @Autowired
-    public ContractServiceImpl(ContractMapper contractMapper, UserMapper userMapper, FeedbackMapper feedbackMapper) {
+    public ContractServiceImpl(ContractMapper contractMapper, UserMapper userMapper, FeedbackMapper feedbackMapper, ManageMapper manageMapper) {
         this.contractMapper = contractMapper;
         this.userMapper = userMapper;
         this.feedbackMapper = feedbackMapper;
+        this.manageMapper = manageMapper;
     }
 
     @Override
@@ -83,5 +92,59 @@ public class ContractServiceImpl implements ContractService {
     @Override
     public List<Feedback> listFeedBacks(RequestInfo requestInfo) {
         return feedbackMapper.listFeedBacks();
+    }
+
+    @Override
+    public List<StatisticSkill> statisticTopSkill(RevenueRequest revenueRequest) {
+        List<StatisticSkill> result = new ArrayList<>();
+        List<Skill> skills = manageMapper.listAllSkill();
+        for (Skill skill : skills) {
+            List<Contract> contracts;
+            if (revenueRequest.getDate_from() > 0) {
+                contracts = contractMapper.getListContractDoneBySkillIdByTime(skill.getId(), revenueRequest.getDate_from(), revenueRequest.getDate_to());
+            } else {
+                contracts = contractMapper.getListContractDoneBySkillId(skill.getId());
+            }
+            double total = 0;
+            if (ServiceUtils.isNotEmpty(contracts)) {
+                for (Contract contract : contracts) {
+                    total += contract.getTotal();
+                }
+            }
+            StatisticSkill statisticSkill = StatisticSkill.builder()
+                    .skill(skill.getName())
+                    .total((int) total)
+                    .build();
+            result.add(statisticSkill);
+
+        }
+        return result;
+    }
+
+    @Override
+    public List<StatisticTutor> statisticTopByTutor(RevenueRequest revenueRequest) {
+        List<StatisticTutor> result = new ArrayList<>();
+        List<User> users = userMapper.findTutorAll();
+        for (User user : users) {
+            List<Contract> contracts;
+            if (revenueRequest.getDate_from() > 0) {
+                contracts = contractMapper.getListContractDoneByTutorIdByTime(user.getId(), revenueRequest.getDate_from(), revenueRequest.getDate_to());
+            } else {
+                contracts = contractMapper.getListContractDoneByTutorId(user.getId());
+            }
+            double total = 0;
+            if (ServiceUtils.isNotEmpty(contracts)) {
+                for (Contract contract : contracts) {
+                    total += contract.getTotal();
+                }
+            }
+            StatisticTutor statisticTutor = StatisticTutor.builder()
+                    .tutor(user.getUsername())
+                    .total((int) total)
+                    .build();
+            result.add(statisticTutor);
+
+        }
+        return result;
     }
 }
