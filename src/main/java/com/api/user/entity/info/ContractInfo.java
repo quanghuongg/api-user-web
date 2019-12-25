@@ -33,6 +33,8 @@ public class ContractInfo {
 
     private String description;
 
+    private String skill;
+
     public ContractInfo(Contract contract) {
         this.number_hour = contract.getNumber_hour();
         this.date_from = contract.getDate_from();

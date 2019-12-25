@@ -51,7 +51,7 @@ public interface UserMapper {
     @Select("SELECT * FROM user WHERE id = #{userId}")
     User findByUserId(int userId);
 
-    @Select("SELECT * FROM user WHERE email = #{email}")
+    @Select("SELECT * FROM user WHERE email = #{email} limit 1")
     User findByEmail(String email);
 
     @Select("SELECT email FROM user")

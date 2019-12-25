@@ -114,7 +114,7 @@ public class UserController {
 
     @RequestMapping(value = {"/reset-password"}, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> resetPassword(@RequestParam String email) throws ApiServiceException, MessagingException {
+    public ResponseEntity<?> resetPassword(@RequestParam String email) throws Exception {
         User user = userService.findByEmail(email);
         if (ServiceUtils.isEmpty(user)) {
             throw new ApiServiceException(Constant.USER_NOT_EXITED);
@@ -143,9 +143,9 @@ public class UserController {
         if (!ServiceUtils.isValidMail(user.getEmail())) {
             throw new ApiServiceException("email invalid");
         }
-        if (userService.checkEmailExisted(user.getEmail())) {
-            throw new ApiServiceException("email existed");
-        }
+//        if (userService.checkEmailExisted(user.getEmail())) {
+//            throw new ApiServiceException("email existed");
+//        }
         if (user.getPhone() != null) {
             if (!ServiceUtils.isValidPhone(user.getPhone())) {
                 throw new ApiServiceException("phone invalid");

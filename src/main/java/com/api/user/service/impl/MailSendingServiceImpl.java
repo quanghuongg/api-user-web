@@ -31,11 +31,11 @@ public class MailSendingServiceImpl implements MailSendingService {
         InternetHeaders headers = new InternetHeaders();
         headers.addHeader("Content-type", "text/html; charset=UTF-8");
 
-        String content = HtmlUtil.createReportMailTemplate("/template-confirm.html", null);
-        String link = "http://localhost:9000/user/confirm-register?id="+ AESUtil.encrypt(userId + "");
+        String content = HtmlUtil.createReportMailTemplate("template/template-confirm.html", null);
+        String link = "http://localhost:9000/user/confirm-register?id=" + AESUtil.encrypt(userId + "");
 
         content = content.replaceAll("__link__", link)
-                    .replaceAll("__Fullname__ ",fullName);
+                .replaceAll("__Fullname__ ", fullName);
         MimeBodyPart body = null;
         try {
             body = new MimeBodyPart(headers, content.getBytes("UTF-8"));
@@ -55,13 +55,15 @@ public class MailSendingServiceImpl implements MailSendingService {
     }
 
     @Override
-    public void mailResetPassword(String email, String display_name, String newPassword) throws MessagingException {
+    public void mailResetPassword(String email, String display_name, String newPassword) throws Exception {
         MimeMessage message = emailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
         InternetHeaders headers = new InternetHeaders();
         headers.addHeader("Content-type", "text/html; charset=UTF-8");
 
-        String content = "New Password: " + newPassword;
+        String content = HtmlUtil.createReportMailTemplate("template/template-reset.html", null);
+        content = content.replaceAll("__PASSWORD__", newPassword)
+                .replaceAll("__Fullname__ ", display_name);
         MimeBodyPart body = null;
         try {
             body = new MimeBodyPart(headers, content.getBytes("UTF-8"));
