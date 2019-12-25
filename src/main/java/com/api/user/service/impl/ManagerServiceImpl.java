@@ -54,6 +54,7 @@ public class ManagerServiceImpl implements ManagerService {
         List<User> list = userMapper.findTutorAll();
         for (User user : list) {
            user.setSkills(userMapper.listSkillByUser(user.getId()));
+           users.add(user);
         }
         return users;
     }
