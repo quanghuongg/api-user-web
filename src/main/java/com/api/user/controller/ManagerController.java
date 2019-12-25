@@ -10,6 +10,10 @@ import com.api.user.entity.model.Response;
 import com.api.user.entity.model.StatisticSkill;
 import com.api.user.entity.model.StatisticTutor;
 import com.api.user.entity.request.RevenueRequest;
+import com.api.user.entity.response.ListContract;
+import com.api.user.entity.response.ListFeedback;
+import com.api.user.entity.response.ListSkill;
+import com.api.user.entity.response.ListUser;
 import com.api.user.exception.ApiServiceException;
 import com.api.user.service.ContractService;
 import com.api.user.service.ManagerService;
@@ -82,6 +86,7 @@ public class ManagerController {
             requestInfo.setSize(10);
         }
         List<User> list = managerService.getAllUser(requestInfo.getRoleId());
+        int total = list.size();
         list = ServiceUtils.paging(list, requestInfo.getPage(), requestInfo.getSize());
         for (User user : list) {
             user.setRole_id(userService.findRoleByUserId(user.getId()).getId());
@@ -96,16 +101,19 @@ public class ManagerController {
                 user.setList_skill(skills);
             }
         }
-
+        ListUser result = ListUser.builder()
+                .page(requestInfo.getPage())
+                .size(requestInfo.getSize())
+                .total(total)
+                .listUser(list).build();
         Response responseObject = Response.builder()
                 .code(0)
-                .data(list)
+                .data(result)
                 .message(Constant.SUCCESS_MESSAGE)
                 .build();
         return new ResponseEntity<>(responseObject, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value = {"/view-detail"}, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<?> viewInfoDetailUser(@RequestParam int userId) throws ApiServiceException {
@@ -179,10 +187,17 @@ public class ManagerController {
             requestInfo.setSize(10);
         }
         List<Skill> skillList = managerService.listSkill();
+        int total = skillList.size();
         skillList = ServiceUtils.paging(skillList, requestInfo.getPage(), requestInfo.getSize());
+        ListSkill result = ListSkill.builder()
+                .skillList(skillList)
+                .total(total)
+                .page(requestInfo.getPage())
+                .size(requestInfo.getSize())
+                .build();
         Response responseObject = Response.builder()
                 .code(0)
-                .data(skillList)
+                .data(result)
                 .message(Constant.SUCCESS_MESSAGE)
                 .build();
         return new ResponseEntity<>(responseObject, HttpStatus.OK);
@@ -199,15 +214,22 @@ public class ManagerController {
             requestInfo.setSize(10);
         }
         List<Contract> list = managerService.getListContract(requestInfo);
+        int total = list.size();
         list = ServiceUtils.paging(list, requestInfo.getPage(), requestInfo.getSize());
         for (Contract contract : list) {
             contract.setTutor(userService.findByUserId(contract.getTutor_id()).getDisplay_name());
             contract.setStudent(userService.findByUserId(contract.getStudent_id()).getDisplay_name());
 
         }
+        ListContract result = ListContract.builder()
+                .contracts(list)
+                .total(total)
+                .page(requestInfo.getPage())
+                .size(requestInfo.getSize())
+                .build();
         Response responseObject = Response.builder()
                 .code(0)
-                .data(list)
+                .data(result)
                 .message(Constant.SUCCESS_MESSAGE)
                 .build();
         return new ResponseEntity<>(responseObject, HttpStatus.OK);
@@ -264,6 +286,7 @@ public class ManagerController {
             requestInfo.setSize(10);
         }
         List<Feedback> feedbackList = contractService.listFeedBacks(requestInfo);
+        int total = feedbackList.size();
         feedbackList = ServiceUtils.paging(feedbackList, requestInfo.getPage(), requestInfo.getSize());
         for (Feedback feedback : feedbackList) {
             Contract contract = contractService.findById(feedback.getContract_id());
@@ -271,9 +294,15 @@ public class ManagerController {
             feedback.setStudent(student.getDisplay_name());
             feedback.setTutor(userService.findByUserId(contract.getTutor_id()).getDisplay_name());
         }
+        ListFeedback result = ListFeedback.builder()
+                .feedbacks(feedbackList)
+                .total(total)
+                .page(requestInfo.getPage())
+                .size(requestInfo.getSize())
+                .build();
         Response responseObject = Response.builder()
                 .code(0)
-                .data(feedbackList)
+                .data(result)
                 .message(Constant.SUCCESS_MESSAGE)
                 .build();
         return new ResponseEntity<>(responseObject, HttpStatus.OK);
@@ -315,5 +344,21 @@ public class ManagerController {
                 .message(Constant.SUCCESS_MESSAGE)
                 .build();
         return new ResponseEntity<>(responseObject, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping(value = {"/pay"}, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> paymentTutor(@RequestParam int contractId) {
+        Contract contract = contractService.findById(contractId);
+        if (ServiceUtils.isNotEmpty(contract)) {
+            contract.setStatus(2);
+            contract.setUpdated(System.currentTimeMillis());
+            contractService.update(contract);
+        }
+        Response response = Response.builder()
+                .code(Constant.SUCCESS_CODE)
+                .message(Constant.SUCCESS_MESSAGE)
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

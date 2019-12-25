@@ -111,9 +111,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public void addSkill(int userId, List<Integer> skillIds) {
         List<Skill> list = manageMapper.listAllSkill();
+        List<Skill> userSkills = userMapper.listSkillByUser(userId);
         if (skillIds.size() > 0) {
             for (int skillId : skillIds) {
-                if (list.stream().map(trans -> trans.getId()).collect(Collectors.toList()).contains(skillId)) {
+                if (list.stream().map(trans -> trans.getId()).collect(Collectors.toList()).contains(skillId) &&
+                        !userSkills.stream().map(trans -> trans.getId()).collect(Collectors.toList()).contains(skillId)) {
                     userMapper.insertUserSkill(new UserSkill(userId, skillId));
                 }
             }
