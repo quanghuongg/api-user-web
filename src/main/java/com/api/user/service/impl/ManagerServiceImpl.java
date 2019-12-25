@@ -38,7 +38,7 @@ public class ManagerServiceImpl implements ManagerService {
         for (User user : list) {
             Role role = userMapper.findRoleByUserId(user.getId());
             user.setSkills(userMapper.listSkillByUser(user.getId()));
-            if (roleId == 0) {
+            if (roleId == 0 && role.getId() != 3) {
                 users.add(user);
             } else if (role.getId() == roleId) {
                 users.add(user);
@@ -53,8 +53,8 @@ public class ManagerServiceImpl implements ManagerService {
 //        List<User> list = userMapper.findUserByFilter(requestInfo.getName(), requestInfo.getOrderBy(), requestInfo.getAddress(), requestInfo.getSkillId());
         List<User> list = userMapper.findTutorAll();
         for (User user : list) {
-           user.setSkills(userMapper.listSkillByUser(user.getId()));
-           users.add(user);
+            user.setSkills(userMapper.listSkillByUser(user.getId()));
+            users.add(user);
         }
         return users;
     }

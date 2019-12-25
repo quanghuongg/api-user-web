@@ -38,6 +38,8 @@ public class Contract {
 
     private  int skill;
 
+    private  String skill_name;
+
 //    0: pending  1: student pay   2 : totur get money
 
 }

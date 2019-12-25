@@ -4,6 +4,7 @@ import com.api.user.entity.Contract;
 import com.api.user.entity.Feedback;
 import com.api.user.entity.info.ContractInfo;
 import com.api.user.entity.model.RequestInfo;
+import com.api.user.entity.model.StatisticRevenue;
 import com.api.user.entity.model.StatisticSkill;
 import com.api.user.entity.model.StatisticTutor;
 import com.api.user.entity.request.RevenueRequest;
@@ -35,4 +36,6 @@ public interface ContractService {
     List<StatisticSkill> statisticTopSkill(RevenueRequest revenueRequest);
 
     List<StatisticTutor> statisticTopByTutor(RevenueRequest revenueRequest);
+
+    List<StatisticRevenue> statisticRevenue(RevenueRequest request);
 }

@@ -5,10 +5,7 @@ import com.api.user.entity.Contract;
 import com.api.user.entity.Feedback;
 import com.api.user.entity.Skill;
 import com.api.user.entity.User;
-import com.api.user.entity.model.RequestInfo;
-import com.api.user.entity.model.Response;
-import com.api.user.entity.model.StatisticSkill;
-import com.api.user.entity.model.StatisticTutor;
+import com.api.user.entity.model.*;
 import com.api.user.entity.request.RevenueRequest;
 import com.api.user.entity.response.ListContract;
 import com.api.user.entity.response.ListFeedback;
@@ -357,6 +354,18 @@ public class ManagerController {
         }
         Response response = Response.builder()
                 .code(Constant.SUCCESS_CODE)
+                .message(Constant.SUCCESS_MESSAGE)
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping(value = {"/statistic"}, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> statisticRevenue(@RequestBody RevenueRequest request) {
+        List<StatisticRevenue> list = contractService.statisticRevenue(request);
+        Response response = Response.builder()
+                .code(Constant.SUCCESS_CODE)
+                .data(list)
                 .message(Constant.SUCCESS_MESSAGE)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);

@@ -6,6 +6,7 @@ import com.api.user.entity.Skill;
 import com.api.user.entity.User;
 import com.api.user.entity.info.ContractInfo;
 import com.api.user.entity.model.RequestInfo;
+import com.api.user.entity.model.StatisticRevenue;
 import com.api.user.entity.model.StatisticSkill;
 import com.api.user.entity.model.StatisticTutor;
 import com.api.user.entity.request.RevenueRequest;
@@ -57,7 +58,12 @@ public class ContractServiceImpl implements ContractService {
 
     @Override
     public List<Contract> listContractByStudentId(Integer id) {
-        return contractMapper.listContractByStudentId(id);
+        List<Contract> list = contractMapper.listContractByStudentId(id);
+        for (Contract contract : list) {
+            contract.setTutor(userMapper.findByUserId(contract.getTutor_id()).getDisplay_name());
+            contract.setSkill_name(manageMapper.findSkillById(contract.getSkill()).getName());
+        }
+        return list;
     }
 
     @Override
@@ -146,5 +152,22 @@ public class ContractServiceImpl implements ContractService {
 
         }
         return result;
+    }
+
+    @Override
+    public List<StatisticRevenue> statisticRevenue(RevenueRequest request) {
+        List<StatisticRevenue> revenues = new ArrayList<>();
+        long dateFrom = request.getDate_from();
+        long dateTo = request.getDate_to();
+        while (dateFrom <= dateTo) {
+            int total = contractMapper.getTotalContractDone(dateFrom, dateFrom + 24 * 60 * 60 * 1000);
+            StatisticRevenue temp = StatisticRevenue.builder()
+                    .date(dateFrom)
+                    .total(total)
+                    .build();
+            revenues.add(temp);
+            dateFrom += 24 * 60 * 60 * 1000;
+        }
+        return revenues;
     }
 }

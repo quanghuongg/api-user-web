@@ -50,4 +50,7 @@ public interface ContractMapper {
 
     @Select("SELECT * FROM contract WHERE tutor_id = #{tutorId} AND status= 2")
     List<Contract> getListContractDoneByTutorId(int tutorId);
+
+    @Select("SELECT SUM(total) FROM contract WHERE  status= 2")
+    int getTotalContractDone(long dateFrom, long l);
 }

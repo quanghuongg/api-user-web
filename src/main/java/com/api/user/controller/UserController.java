@@ -133,7 +133,7 @@ public class UserController {
 
     @RequestMapping(value = {"/register"}, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> registerUser(@RequestBody User user) throws ApiServiceException, MessagingException {
+    public ResponseEntity<?> registerUser(@RequestBody User user) throws Exception {
         if (user.getUsername().isEmpty() || user.getPassword().isEmpty() || user.getRole_id() == 0 || ServiceUtils.isEmpty(user.getEmail())
                 || ServiceUtils.isEmpty(user.getEmail())
         ) {
