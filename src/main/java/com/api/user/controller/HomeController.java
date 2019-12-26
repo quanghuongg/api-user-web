@@ -36,7 +36,13 @@ public class HomeController {
         if (ServiceUtils.isEmpty(requestInfo.getOrderBy())) {
             requestInfo.setOrderBy("DESC");
         }
-        List<User> list = managerService.listTutor(requestInfo);
+        List<User> list = null;
+        if (requestInfo.getSkillId() > 0) {
+            list = managerService.listTutorBySkill(requestInfo.getSkillId());
+        } else {
+            list = managerService.listTutor(requestInfo);
+
+        }
         int total = list.size();
         list = ServiceUtils.paging(list, requestInfo.getPage(), requestInfo.getSize());
         ListUser result = ListUser.builder()
@@ -52,4 +58,6 @@ public class HomeController {
                 .build();
         return new ResponseEntity<>(responseObject, HttpStatus.OK);
     }
+
+
 }

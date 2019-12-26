@@ -9,6 +9,7 @@ import com.api.user.mapper.ContractMapper;
 import com.api.user.mapper.ManageMapper;
 import com.api.user.mapper.UserMapper;
 import com.api.user.service.ManagerService;
+import com.api.user.uitls.ServiceUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,13 +51,26 @@ public class ManagerServiceImpl implements ManagerService {
     @Override
     public List<User> listTutor(RequestInfo requestInfo) {
         List<User> users = new ArrayList<>();
-//        List<User> list = userMapper.findUserByFilter(requestInfo.getName(), requestInfo.getOrderBy(), requestInfo.getAddress(), requestInfo.getSkillId());
-        List<User> list = userMapper.findTutorAll();
+        List<User> list = null;
+        if (ServiceUtils.isNotEmpty(requestInfo.getAddress()) && ServiceUtils.isNotEmpty(requestInfo.getName())) {
+            list = userMapper.findUserNameAndAddress(requestInfo.getName(), requestInfo.getAddress());
+        } else if (ServiceUtils.isEmpty(requestInfo.getAddress()) && ServiceUtils.isNotEmpty(requestInfo.getName())) {
+            list = userMapper.findListUserByName(requestInfo.getName());
+        } else if (ServiceUtils.isNotEmpty(requestInfo.getAddress()) && ServiceUtils.isEmpty(requestInfo.getName())) {
+            list = userMapper.findUserAddress(requestInfo.getAddress());
+        } else {
+            list = userMapper.findTutorAll();
+        }
         for (User user : list) {
             user.setSkills(userMapper.listSkillByUser(user.getId()));
             users.add(user);
         }
-        return users;
+        return list;
+    }
+
+    @Override
+    public List<User> listTutorBySkill(int skillId) {
+        return userMapper.findUserBySkillId(skillId);
     }
 
     @Override
