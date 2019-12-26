@@ -66,7 +66,7 @@ public interface UserMapper {
     List<Skill> listSkillByUser(int userId);
 
 
-    @Select("SELECT  user.* FROM user, user_skill WHERE user_skill.skill_id =#{skill_id} AND user_skill.user_id = user.id   ")
+    @Select("SELECT distinct user.* FROM user, user_skill WHERE user_skill.skill_id =#{skill_id} AND user_skill.user_id = user.id   ")
     List<User> findUserBySkillId(@Param("skill_id") int skill_id);
 
     @Select("SELECT  user.* FROM user WHERE user.display_name LIKE '%' #{username} '%'  AND  user.address LIKE '%' #{address} '%' ")
