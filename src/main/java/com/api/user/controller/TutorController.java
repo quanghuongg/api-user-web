@@ -65,7 +65,7 @@ public class TutorController {
     }
 
     @PreAuthorize("hasRole('TUTOR')")
-    @RequestMapping(value = {"/statistic-revenue"}, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = {"/statistic-revenue"}, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> statisticRevenue(@RequestBody RevenueRequest request) throws ApiServiceException {
         Authentication authUser = SecurityContextHolder.getContext().getAuthentication();
         if (authUser.getName().isEmpty()) {
