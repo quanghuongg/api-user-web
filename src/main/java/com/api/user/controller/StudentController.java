@@ -105,7 +105,6 @@ public class StudentController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('STUDENT')")
     @RequestMapping(value = {"/detail-contract"}, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> detailContract(@RequestParam int contract_id) throws ApiServiceException {
         Authentication authUser = SecurityContextHolder.getContext().getAuthentication();
