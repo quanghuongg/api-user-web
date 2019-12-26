@@ -68,7 +68,7 @@ public class ContractServiceImpl implements ContractService {
 
     @Override
     public List<Contract> listContractByTutorId(Integer id) {
-        List<Contract> list = contractMapper.listContractByStudentId(id);
+        List<Contract> list = contractMapper.listContractByTutorId(id);
         for (Contract contract : list) {
             contract.setStudent(userMapper.findByUserId(contract.getStudent_id()).getDisplay_name());
             contract.setSkill_name(manageMapper.findSkillById(contract.getSkill()).getName());
