@@ -35,6 +35,10 @@ public class ContractInfo {
 
     private String skill;
 
+    private int tutor_id;
+
+    private int student_id;
+
     public ContractInfo(Contract contract) {
         this.number_hour = contract.getNumber_hour();
         this.date_from = contract.getDate_from();

@@ -83,6 +83,8 @@ public class ContractServiceImpl implements ContractService {
         User tutor = userMapper.findByUserId(contract.getTutor_id());
         contractInfo.setTutorName(tutor.getDisplay_name());
         contractInfo.setSkill(manageMapper.findSkillById(contract.getSkill()).getName());
+        contractInfo.setTutor_id(contract.getTutor_id());
+        contractInfo.setStudent_id(contract.getStudent_id());
         return contractInfo;
     }
 
