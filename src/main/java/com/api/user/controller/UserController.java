@@ -143,9 +143,9 @@ public class UserController {
         if (!ServiceUtils.isValidMail(user.getEmail())) {
             throw new ApiServiceException("email invalid");
         }
-//        if (userService.checkEmailExisted(user.getEmail())) {
-//            throw new ApiServiceException("email existed");
-//        }
+        if (userService.checkEmailExisted(user.getEmail())) {
+            throw new ApiServiceException("email existed");
+        }
         if (user.getPhone() != null) {
             if (!ServiceUtils.isValidPhone(user.getPhone())) {
                 throw new ApiServiceException("phone invalid");
